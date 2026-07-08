@@ -1,0 +1,23 @@
+{
+  "name": "cafe-app-copy",
+  "version": "1.0.0",
+  "description": "Our purpose is going to the mars \r 테스트",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoLucas/project1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NoLucas/project1/issues"
+  },
+  "homepage": "https://github.com/NoLucas/project1#readme",
+  "dependencies": {
+    "serve": "^14.2.6"
+  }
+}

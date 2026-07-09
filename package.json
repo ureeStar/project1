@@ -4,19 +4,21 @@
   "description": "Our purpose is going to the mars \r 테스트",
   "main": "index.js",
   "scripts": {
+    "start": "serve -l 3112",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NoLucas/project1.git"
+    "url": "git+https://github.com/ureeStar/project1.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/NoLucas/project1/issues"
+    "url": "https://github.com/ureeStar/project1/issues"
   },
-  "homepage": "https://github.com/NoLucas/project1#readme",
+  "homepage": "https://github.com/ureeStar/project1#readme",
   "dependencies": {
     "serve": "^14.2.6"
   }

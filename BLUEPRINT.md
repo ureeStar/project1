@@ -184,3 +184,8 @@ project1/
 - [x] `frontend/admin/orders/edit.html` — 주문 상태 수정
 - [x] `frontend/admin/orders/edit.css`
 - [x] `frontend/admin/orders/edit.js`
+> 2026-07-11 구조 변경 메모
+>
+> 현재 실제 실행 구조는 `frontend/`, `backend/` 분리형이 아니라 리포지토리 루트가 바로 웹 루트입니다.
+> `index.html`, `admin/`, `menus/`, `my/`, `basket/`, `orders/`, `css/`, `js/`가 모두 프로젝트 루트 바로 아래에 있습니다.
+> 아래 상세 체크리스트에 남아 있는 `frontend/` 표기는 이전 구조 기준 기록입니다.

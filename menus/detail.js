@@ -1,8 +1,44 @@
-// ===== 상태 =====
+const MENU_IMAGE_FALLBACKS = {
+  americano: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1200&q=80",
+  latte: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=1200&q=80",
+  cappuccino: "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=1200&q=80",
+  "vanilla-latte": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=1200&q=80",
+  "earl-grey": "https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=1200&q=80",
+  peppermint: "https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=1200&q=80",
+  "lemon-ade": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&w=1200&q=80",
+  "grapefruit-ade": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=80",
+  cheesecake: "https://images.unsplash.com/photo-1524351199678-941a58a3df50?auto=format&fit=crop&w=1200&q=80",
+  croissant: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=1200&q=80",
+};
+
+const CATEGORY_LABELS = {
+  coffee: "Coffee",
+  tea: "Non-Coffee",
+  ade: "Non-Coffee",
+  dessert: "Dessert",
+};
+
 let currentMenu = null;
 let quantity = 1;
 
-// ===== 초기화 =====
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getMenuImage(menu) {
+  return menu.image || MENU_IMAGE_FALLBACKS[menu.id] || MENU_IMAGE_FALLBACKS.americano;
+}
+
+function getCategoryLabel(categoryId) {
+  const category = getCategoryById(categoryId);
+  return CATEGORY_LABELS[categoryId] || (category ? category.name : "Seasonal");
+}
+
 function init() {
   const params = new URLSearchParams(window.location.search);
   const menuId = params.get("id");
@@ -12,59 +48,163 @@ function init() {
   updateCartBadge();
 }
 
-// ===== 메뉴 상세 렌더링 =====
 function renderMenuDetail() {
   const detailEl = document.getElementById("menuDetail");
+  if (!detailEl) return;
 
   if (!currentMenu) {
-    detailEl.innerHTML = `<p class="not-found">메뉴를 찾을 수 없습니다.</p>`;
+    detailEl.innerHTML = `
+      <section class="not-found">
+        <strong>메뉴를 찾을 수 없습니다.</strong>
+        <a class="secondary-button" href="list.html">목록으로 돌아가기</a>
+      </section>
+    `;
     return;
   }
 
-  const category = getCategoryById(currentMenu.categoryId);
-  const soldOut = currentMenu.soldOut;
+  const soldOut = Boolean(currentMenu.soldOut);
 
   detailEl.innerHTML = `
-    <div class="menu-detail-image">☕</div>
-    <div class="menu-detail-body">
-      ${category ? `<span class="menu-detail-category">${category.name}</span>` : ""}
-      <h2 class="menu-detail-name">${currentMenu.name}</h2>
-      <p class="menu-detail-price">${formatPrice(currentMenu.price)}</p>
-      <p class="menu-detail-desc">${currentMenu.description}</p>
-      ${soldOut ? `<span class="menu-detail-soldout">품절된 메뉴입니다</span>` : renderQuantityStepper()}
-    </div>
-    ${soldOut ? "" : renderActionBar()}
+    <section class="detail-layout">
+      <div class="menu-detail-image">
+        <img src="${escapeHTML(getMenuImage(currentMenu))}" alt="${escapeHTML(currentMenu.name)}" />
+        ${soldOut ? `<span class="menu-detail-soldout">품절</span>` : ""}
+      </div>
+
+      <div class="menu-detail-body">
+        <a class="back-link" href="list.html">메뉴 목록</a>
+        <span class="menu-detail-category">${escapeHTML(getCategoryLabel(currentMenu.categoryId))}</span>
+        <h1 class="menu-detail-name">${escapeHTML(currentMenu.name)}</h1>
+        <p class="menu-detail-price">${formatPrice(Number(currentMenu.price) || 0)}</p>
+        <p class="menu-detail-desc">${escapeHTML(currentMenu.description || "매장에서 준비한 메뉴입니다.")}</p>
+
+        <dl class="menu-meta">
+          <div>
+            <dt>구성</dt>
+            <dd>매장에서 제조 후 바로 픽업</dd>
+          </div>
+          <div>
+            <dt>알레르기</dt>
+            <dd>우유, 견과류 취급 공간에서 제조</dd>
+          </div>
+        </dl>
+
+        ${soldOut ? renderSoldOutNotice() : renderOrderControls()}
+      </div>
+    </section>
+
+    <section class="recommend-section" aria-labelledby="recommendTitle">
+      <div class="section-heading">
+        <p class="section-kicker">You may also like</p>
+        <h2 id="recommendTitle">함께 보기 좋은 메뉴</h2>
+      </div>
+      <div class="recommend-grid">${renderRecommendedMenus()}</div>
+    </section>
   `;
 
   if (!soldOut) {
+    bindOptionEvents();
     bindQuantityEvents();
     bindAddToCartEvent();
   }
 }
 
-function renderQuantityStepper() {
+function renderSoldOutNotice() {
   return `
-    <div class="quantity-stepper">
-      <button class="quantity-btn" id="decreaseBtn" aria-label="수량 감소">-</button>
-      <span class="quantity-value" id="quantityValue">${quantity}</span>
-      <button class="quantity-btn" id="increaseBtn" aria-label="수량 증가">+</button>
+    <div class="soldout-panel">
+      <strong>지금은 준비가 끝난 메뉴입니다.</strong>
+      <p>다른 추천 메뉴를 둘러보거나 나중에 다시 확인해주세요.</p>
     </div>
+  `;
+}
+
+function renderOrderControls() {
+  return `
+    <section class="order-panel" aria-label="주문 옵션">
+      <div class="option-group">
+        <span class="option-title">온도</span>
+        <div class="segmented-control" aria-label="온도 옵션">
+          <button class="selected" type="button">Hot</button>
+          <button type="button">Ice</button>
+        </div>
+      </div>
+
+      <div class="option-group">
+        <span class="option-title">사이즈</span>
+        <div class="segmented-control" aria-label="사이즈 옵션">
+          <button class="selected" type="button">Regular</button>
+          <button type="button">Large</button>
+        </div>
+      </div>
+
+      <div class="quantity-stepper">
+        <span class="option-title">수량</span>
+        <div>
+          <button class="quantity-btn" id="decreaseBtn" type="button" aria-label="수량 감소">-</button>
+          <span class="quantity-value" id="quantityValue">${quantity}</span>
+          <button class="quantity-btn" id="increaseBtn" type="button" aria-label="수량 증가">+</button>
+        </div>
+      </div>
+    </section>
+
+    ${renderActionBar()}
   `;
 }
 
 function renderActionBar() {
   return `
     <div class="action-bar glass">
-      <span class="action-bar-total" id="actionBarTotal">${formatPrice(currentMenu.price * quantity)}</span>
-      <button class="add-to-cart-btn" id="addToCartBtn">장바구니 담기</button>
+      <div>
+        <span>총 금액</span>
+        <strong class="action-bar-total" id="actionBarTotal">${formatPrice(currentMenu.price * quantity)}</strong>
+      </div>
+      <button class="add-to-cart-btn" id="addToCartBtn" type="button">장바구니 담기</button>
     </div>
   `;
 }
 
-// ===== 수량 조절 =====
+function renderRecommendedMenus() {
+  const menus = getAllMenus()
+    .filter((menu) => menu.id !== currentMenu.id && !menu.soldOut)
+    .slice(0, 3);
+
+  if (!menus.length) {
+    return `<p class="empty-state">추천 가능한 메뉴가 없습니다.</p>`;
+  }
+
+  return menus
+    .map(
+      (menu) => `
+        <a class="recommend-card" href="detail.html?id=${encodeURIComponent(menu.id)}">
+          <img src="${escapeHTML(getMenuImage(menu))}" alt="${escapeHTML(menu.name)}" loading="lazy" />
+          <span>${escapeHTML(getCategoryLabel(menu.categoryId))}</span>
+          <strong>${escapeHTML(menu.name)}</strong>
+          <small>${formatPrice(menu.price)}</small>
+        </a>
+      `
+    )
+    .join("");
+}
+
+function bindOptionEvents() {
+  document.querySelectorAll(".segmented-control").forEach((control) => {
+    control.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) return;
+
+      const button = event.target.closest("button");
+      if (!button) return;
+
+      control.querySelectorAll("button").forEach((item) => {
+        item.classList.toggle("selected", item === button);
+      });
+    });
+  });
+}
+
 function bindQuantityEvents() {
   const decreaseBtn = document.getElementById("decreaseBtn");
   const increaseBtn = document.getElementById("increaseBtn");
+  if (!decreaseBtn || !increaseBtn) return;
 
   decreaseBtn.disabled = quantity <= 1;
 
@@ -82,33 +222,38 @@ function bindQuantityEvents() {
 }
 
 function updateQuantityDisplay() {
-  document.getElementById("quantityValue").textContent = quantity;
-  document.getElementById("decreaseBtn").disabled = quantity <= 1;
-  document.getElementById("actionBarTotal").textContent = formatPrice(currentMenu.price * quantity);
+  const quantityValue = document.getElementById("quantityValue");
+  const decreaseBtn = document.getElementById("decreaseBtn");
+  const actionBarTotal = document.getElementById("actionBarTotal");
+
+  if (quantityValue) quantityValue.textContent = quantity;
+  if (decreaseBtn) decreaseBtn.disabled = quantity <= 1;
+  if (actionBarTotal) actionBarTotal.textContent = formatPrice(currentMenu.price * quantity);
 }
 
-// ===== 장바구니 담기 =====
 function bindAddToCartEvent() {
   const addToCartBtn = document.getElementById("addToCartBtn");
+  if (!addToCartBtn) return;
 
   addToCartBtn.addEventListener("click", () => {
     addToCart(currentMenu.id, quantity);
     updateCartBadge();
 
     const originalText = addToCartBtn.textContent;
-    addToCartBtn.textContent = "담았습니다!";
+    addToCartBtn.textContent = "담았습니다";
     addToCartBtn.disabled = true;
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       addToCartBtn.textContent = originalText;
       addToCartBtn.disabled = false;
     }, 1200);
   });
 }
 
-// ===== 장바구니 배지 =====
 function updateCartBadge() {
   const badgeEl = document.getElementById("cartBadge");
+  if (!badgeEl) return;
+
   const count = getCartTotalCount();
 
   if (count > 0) {

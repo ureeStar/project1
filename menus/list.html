@@ -3,24 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>메뉴 - 카페 앱</title>
+  <title>메뉴 - Mellow Yard Coffee</title>
   <link rel="stylesheet" href="../css/variables.css" />
   <link rel="stylesheet" href="list.css" />
 </head>
 <body>
-  <header class="page-header glass">
+  <header class="page-header">
     <a href="../index.html" class="icon-btn" aria-label="홈으로">‹</a>
-    <h1>메뉴</h1>
+    <a class="header-brand" href="../index.html">
+      <strong>Mellow Yard</strong>
+      <span>Menu</span>
+    </a>
     <a href="../basket/list.html" class="icon-btn cart-btn" aria-label="장바구니">
-      🛒
+      Bag
       <span class="cart-badge" id="cartBadge" hidden>0</span>
     </a>
   </header>
 
-  <main class="container">
-    <div class="category-tabs" id="categoryTabs"></div>
-    <div class="menu-grid" id="menuGrid"></div>
+  <main class="menu-page container">
+    <section class="menu-hero" aria-labelledby="menuTitle">
+      <p class="section-kicker">Order your cup</p>
+      <h1 id="menuTitle">오늘 마실 커피를 빠르게 고르세요</h1>
+      <p>검색, 카테고리, 정렬로 원하는 메뉴를 찾고 바로 장바구니에 담을 수 있습니다.</p>
+    </section>
+
+    <section class="control-panel" aria-label="메뉴 검색과 필터">
+      <label class="search-field" for="searchInput">
+        <span>검색</span>
+        <input id="searchInput" type="search" placeholder="메뉴명 또는 설명 검색" autocomplete="off" />
+      </label>
+
+      <label class="sort-field" for="sortSelect">
+        <span>정렬</span>
+        <select id="sortSelect">
+          <option value="featured">추천순</option>
+          <option value="price-low">낮은 가격순</option>
+          <option value="price-high">높은 가격순</option>
+          <option value="name">이름순</option>
+        </select>
+      </label>
+    </section>
+
+    <div class="category-tabs" id="categoryTabs" aria-label="카테고리"></div>
+
+    <section class="recommend-section" aria-labelledby="recommendTitle">
+      <div class="section-heading">
+        <p class="section-kicker">Recommended</p>
+        <h2 id="recommendTitle">처음이라면 이 메뉴부터</h2>
+      </div>
+      <div class="recommend-strip" id="recommendMenuList"></div>
+    </section>
+
+    <section class="menu-results" aria-labelledby="resultTitle">
+      <div class="result-header">
+        <div>
+          <p class="section-kicker">Menu board</p>
+          <h2 id="resultTitle">전체 메뉴</h2>
+        </div>
+        <p id="resultText" class="result-count">총 0개</p>
+      </div>
+      <div class="menu-grid" id="menuGrid" aria-live="polite"></div>
+    </section>
   </main>
+
+  <p class="cart-feedback" id="cartFeedback" role="status" aria-live="polite"></p>
 
   <script src="../js/data.js"></script>
   <script src="../js/utils.js"></script>

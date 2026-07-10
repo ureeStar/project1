@@ -61,19 +61,48 @@
 }
 
 /* ===== Order Detail ===== */
+.order-detail-shell {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-lg) 0 var(--space-2xl);
+}
+
+.order-status-panel {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+}
+
 .order-detail-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-top: var(--space-lg);
+  gap: var(--space-md);
+}
+
+.order-detail-heading {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.order-detail-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 .order-detail-id {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 700;
 }
 
 .order-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.75rem;
   padding: var(--space-xs) var(--space-sm);
   font-size: 0.75rem;
   font-weight: 700;
@@ -85,27 +114,125 @@
   background: var(--color-surface-alt);
 }
 
-.order-status.status-preparing {
+.order-status.status-making {
   color: var(--color-text-inverse);
   background: var(--color-warning);
 }
 
-.order-status.status-done {
+.order-status.status-ready {
+  color: #0f6375;
+  background: rgba(61, 137, 160, 0.14);
+}
+
+.order-status.status-picked {
   color: var(--color-text-inverse);
   background: var(--color-success);
 }
 
+.order-status-copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.order-status-kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.order-status-message {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .order-detail-date {
-  margin-top: var(--space-xs);
+  margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.order-progress {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.order-progress-step {
+  position: relative;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.order-progress-step::after {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  left: calc(100% - 0.25rem);
+  width: calc(100% - 0.5rem);
+  height: 1px;
+  background: rgba(45, 31, 20, 0.12);
+}
+
+.order-progress-step:last-child::after {
+  display: none;
+}
+
+.order-progress-dot {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(45, 31, 20, 0.14);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.order-progress-text {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.order-progress-label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.order-progress-caption {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.order-progress-step.is-complete .order-progress-dot,
+.order-progress-step.is-current .order-progress-dot {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+.order-progress-step.is-complete::after {
+  background: rgba(169, 112, 70, 0.38);
+}
+
+.order-progress-step.is-current .order-progress-dot {
+  box-shadow: 0 0 0 6px rgba(169, 112, 70, 0.12);
 }
 
 .order-item-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  margin-top: var(--space-lg);
   padding: var(--space-lg);
 }
 
@@ -139,7 +266,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: var(--space-lg);
   padding: var(--space-lg);
 }
 
@@ -158,4 +284,27 @@
   padding: var(--space-2xl) 0;
   text-align: center;
   color: var(--color-text-muted);
+}
+
+@media (max-width: 720px) {
+  .order-detail-top {
+    flex-direction: column;
+  }
+
+  .order-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .order-progress-step {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    column-gap: var(--space-sm);
+  }
+
+  .order-progress-step::after {
+    top: 2.25rem;
+    left: 1rem;
+    width: 1px;
+    height: calc(100% - 1rem);
+  }
 }

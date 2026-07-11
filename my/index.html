@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="page-header glass">
-    <a href="../index.html" class="icon-btn" aria-label="홈으로">‹</a>
+    <a href="../index.html" class="icon-btn" aria-label="홈으로 이동">←</a>
     <h1>마이페이지</h1>
     <a href="../basket/list.html" class="icon-btn cart-btn" aria-label="장바구니">
       🛒
@@ -18,60 +18,98 @@
   </header>
 
   <main class="container">
-    <section class="profile-card glass">
-      <div class="profile-avatar">☕</div>
-      <div class="profile-info">
-        <p class="profile-name">게스트님</p>
-        <p class="profile-desc">로그인하고 주문 내역을 더 편하게 관리해보세요.</p>
+    <section class="welcome-card glass">
+      <div class="welcome-copy">
+        <p class="welcome-eyebrow">Warm Minimal Specialty Cafe</p>
+        <h2 class="welcome-title">반가워요, 오늘도 좋은 커피를 준비해둘게요.</h2>
+        <p class="welcome-text">최근 주문과 스탬프, 자주 쓰는 메뉴 이동을 한 번에 확인할 수 있습니다.</p>
+      </div>
+      <div class="welcome-aside">
+        <div class="profile-avatar">C</div>
+        <div class="profile-meta">
+          <p class="profile-name">게스트님</p>
+          <p class="profile-desc">취향에 맞는 커피 루틴을 이어가보세요.</p>
+        </div>
       </div>
     </section>
 
-    <section class="stat-grid">
-      <article class="stat-card glass">
-        <span class="stat-label">장바구니</span>
-        <strong class="stat-value" id="cartCount">0개</strong>
+    <section class="summary-grid" aria-label="요약 정보">
+      <article class="summary-card glass">
+        <span class="summary-label">장바구니</span>
+        <strong class="summary-value" id="cartCount">0개</strong>
+        <span class="summary-subtext" id="cartPrice">0원</span>
       </article>
-      <article class="stat-card glass">
-        <span class="stat-label">예상 결제 금액</span>
-        <strong class="stat-value" id="cartPrice">0원</strong>
+      <article class="summary-card glass">
+        <span class="summary-label">보유 스탬프</span>
+        <strong class="summary-value" id="stampCount">0개</strong>
+        <span class="summary-subtext" id="stampMessage">다음 리워드까지 12개</span>
       </article>
     </section>
 
-    <nav class="menu-list">
-      <a href="../orders/list.html" class="menu-item glass">
-        <span class="menu-item-icon">🧾</span>
-        <span class="menu-item-label">주문 내역</span>
-        <span class="menu-item-arrow">›</span>
-      </a>
-      <a href="../basket/list.html" class="menu-item glass">
-        <span class="menu-item-icon">🛒</span>
-        <span class="menu-item-label">장바구니</span>
-        <span class="menu-item-arrow">›</span>
-      </a>
-      <a href="../menus/list.html" class="menu-item glass">
-        <span class="menu-item-icon">☕</span>
-        <span class="menu-item-label">전체 메뉴 보기</span>
-        <span class="menu-item-arrow">›</span>
-      </a>
-    </nav>
+    <section class="recent-order glass" aria-labelledby="recentOrderTitle">
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Recent Order</p>
+          <h2 class="section-title" id="recentOrderTitle">최근 주문</h2>
+        </div>
+        <a class="section-link" href="../orders/list.html">전체 보기</a>
+      </div>
+      <div id="recentOrderCard"></div>
+    </section>
 
-    <section class="section-block">
-      <h2 class="section-title">고객 지원</h2>
-      <nav class="menu-list">
-        <button class="menu-item glass" type="button" data-info="notice">
-          <span class="menu-item-icon">📢</span>
-          <span class="menu-item-label">공지사항</span>
-          <span class="menu-item-arrow">›</span>
+    <section class="stamp-section glass" aria-labelledby="stampTitle">
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Loyalty</p>
+          <h2 class="section-title" id="stampTitle">스탬프</h2>
+        </div>
+      </div>
+      <div class="stamp-grid" id="stampGrid" aria-label="스탬프 현황"></div>
+    </section>
+
+    <section class="quick-actions" aria-labelledby="quickActionTitle">
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Quick Access</p>
+          <h2 class="section-title" id="quickActionTitle">바로가기</h2>
+        </div>
+      </div>
+      <div class="action-grid">
+        <a href="../orders/list.html" class="action-card glass">
+          <span class="action-icon">☕</span>
+          <span class="action-title">주문 바로가기</span>
+          <span class="action-text">현재 주문 상태와 지난 주문을 확인합니다.</span>
+        </a>
+        <a href="../basket/list.html" class="action-card glass">
+          <span class="action-icon">🛒</span>
+          <span class="action-title">장바구니 바로가기</span>
+          <span class="action-text">담아둔 메뉴와 결제 예정 금액을 확인합니다.</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="settings-section" aria-labelledby="settingsTitle">
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Settings</p>
+          <h2 class="section-title" id="settingsTitle">설정</h2>
+        </div>
+      </div>
+      <nav class="settings-list">
+        <button class="settings-item glass" type="button" data-info="notice">
+          <span class="settings-icon">⌁</span>
+          <span class="settings-label">공지사항</span>
+          <span class="settings-arrow">→</span>
         </button>
-        <button class="menu-item glass" type="button" data-info="faq">
-          <span class="menu-item-icon">💬</span>
-          <span class="menu-item-label">자주 묻는 질문</span>
-          <span class="menu-item-arrow">›</span>
+        <button class="settings-item glass" type="button" data-info="faq">
+          <span class="settings-icon">?</span>
+          <span class="settings-label">자주 묻는 질문</span>
+          <span class="settings-arrow">→</span>
         </button>
-        <button class="menu-item glass" type="button" data-info="terms">
-          <span class="menu-item-icon">📄</span>
-          <span class="menu-item-label">이용약관 및 정책</span>
-          <span class="menu-item-arrow">›</span>
+        <button class="settings-item glass" type="button" data-info="terms">
+          <span class="settings-icon">□</span>
+          <span class="settings-label">이용약관 및 정책</span>
+          <span class="settings-arrow">→</span>
         </button>
       </nav>
     </section>

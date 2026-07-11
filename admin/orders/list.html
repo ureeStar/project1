@@ -65,26 +65,42 @@
           </section>
 
           <section class="filter-panel glass">
-            <label class="field">
-              <span>상태</span>
-              <select id="statusFilter">
-                <option value="all">전체</option>
-                <option value="주문접수">주문접수</option>
-                <option value="준비중">준비중</option>
-                <option value="완료">완료</option>
-              </select>
-            </label>
+            <div class="filter-head">
+              <div>
+                <p class="panel-eyebrow">Search & Filter</p>
+                <h2>주문 탐색</h2>
+              </div>
+              <div class="status-legend" aria-hidden="true">
+                <span class="order-status status-received">주문접수</span>
+                <span class="order-status status-preparing">준비중</span>
+                <span class="order-status status-done">완료</span>
+              </div>
+            </div>
 
-            <label class="field field-search">
-              <span>검색</span>
-              <input id="keywordInput" type="search" placeholder="주문 번호로 검색" />
-            </label>
+            <div class="filter-grid">
+              <label class="field">
+                <span>상태 필터</span>
+                <select id="statusFilter">
+                  <option value="all">전체</option>
+                  <option value="주문접수">주문접수</option>
+                  <option value="준비중">준비중</option>
+                  <option value="완료">완료</option>
+                </select>
+              </label>
+
+              <label class="field field-search">
+                <span>검색</span>
+                <input id="keywordInput" type="search" placeholder="주문 번호 또는 메뉴명 검색" />
+              </label>
+            </div>
           </section>
 
           <section class="list-panel">
             <div class="list-header">
-              <h2>주문 목록</h2>
-              <p id="resultText">총 0건</p>
+              <div>
+                <h2>주문 목록</h2>
+                <p id="resultText">총 0건</p>
+              </div>
             </div>
             <div id="orderList" class="order-list"></div>
           </section>

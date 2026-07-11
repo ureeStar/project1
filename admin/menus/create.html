@@ -3,62 +3,90 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>관리자 - 메뉴 등록</title>
+    <title>관리자 - 새 메뉴 등록</title>
     <link rel="stylesheet" href="../../css/variables.css" />
     <link rel="stylesheet" href="./create.css" />
+    <link rel="stylesheet" href="../layout.css" />
   </head>
   <body>
-    <div class="page-shell container">
-      <header class="page-header">
-        <div>
-          <p class="eyebrow">Admin · Create Menu</p>
-          <h1>새 메뉴 등록</h1>
+    <div class="page-shell admin-shell">
+      <aside class="admin-sidebar" aria-label="관리자 메뉴">
+        <a class="admin-brand" href="../index.html">
+          <span class="admin-brand-mark">C</span>
+          <span class="admin-brand-name">Cafe Admin</span>
+          <span class="admin-brand-meta">Specialty operations</span>
+        </a>
+        <nav class="admin-nav">
+          <p class="admin-nav-label">Workspace</p>
+          <a class="admin-nav-link" href="../index.html">대시보드</a>
+          <a class="admin-nav-link is-active" href="./list.html">메뉴 관리</a>
+          <a class="admin-nav-link" href="../orders/list.html">주문 관리</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+          <a class="admin-nav-link" href="../../index.html">고객 화면</a>
         </div>
-        <a class="secondary-link" href="./list.html">목록으로</a>
-      </header>
+      </aside>
 
-      <main class="form-card">
-        <form id="menuForm" class="menu-form">
-          <div class="field-grid">
-            <label class="field">
-              <span>메뉴명</span>
-              <input name="name" type="text" maxlength="30" required />
-            </label>
-
-            <label class="field">
-              <span>카테고리</span>
-              <select name="categoryId" id="categorySelect" required></select>
-            </label>
-
-            <label class="field">
-              <span>가격</span>
-              <input name="price" type="number" min="0" step="100" required />
-            </label>
-
-            <label class="field">
-              <span>이미지 경로</span>
-              <input name="image" type="text" placeholder="/images/menu.jpg" />
-            </label>
+      <div class="admin-main">
+        <header class="admin-header">
+          <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+            <span>Admin</span>
+            <span>메뉴 관리</span>
+            <span>등록</span>
+          </nav>
+          <div class="admin-header-row">
+            <div>
+              <p class="eyebrow">Create Menu</p>
+              <h1>새 메뉴 등록</h1>
+            </div>
+            <div class="admin-header-actions">
+              <a class="secondary-link" href="./list.html">목록으로</a>
+            </div>
           </div>
+        </header>
 
-          <label class="field">
-            <span>설명</span>
-            <textarea name="description" rows="5" maxlength="200"></textarea>
-          </label>
+        <main class="container page-content admin-content">
+          <section class="form-card">
+            <form id="menuForm" class="menu-form">
+              <div class="field-grid">
+                <label class="field">
+                  <span>메뉴 ID</span>
+                  <input name="id" type="text" placeholder="비워두면 자동 생성" />
+                </label>
+                <label class="field">
+                  <span>카테고리</span>
+                  <select name="categoryId" id="categorySelect" required></select>
+                </label>
+                <label class="field">
+                  <span>메뉴명</span>
+                  <input name="name" type="text" required />
+                </label>
+                <label class="field">
+                  <span>가격</span>
+                  <input name="price" type="number" min="0" step="100" required />
+                </label>
+              </div>
 
-          <label class="checkbox-field">
-            <input name="soldOut" type="checkbox" />
-            <span>등록과 동시에 품절 상태로 표시</span>
-          </label>
+              <label class="field">
+                <span>설명</span>
+                <textarea name="description" rows="4"></textarea>
+              </label>
 
-          <p id="message" class="message" aria-live="polite"></p>
+              <label class="checkbox-field">
+                <input name="soldOut" type="checkbox" />
+                <span>품절 상태로 등록</span>
+              </label>
 
-          <div class="form-actions">
-            <button class="secondary-button" type="button" id="cancelButton">취소</button>
-            <button class="primary-button" type="submit">등록하기</button>
-          </div>
-        </form>
-      </main>
+              <p id="message" class="message" aria-live="polite"></p>
+
+              <div class="form-actions">
+                <button class="secondary-button" type="button" id="cancelButton">취소</button>
+                <button class="primary-button" type="submit">등록하기</button>
+              </div>
+            </form>
+          </section>
+        </main>
+      </div>
     </div>
 
     <script src="../../js/data.js"></script>

@@ -6,62 +6,90 @@
     <title>관리자 - 주문 관리</title>
     <link rel="stylesheet" href="../../css/variables.css" />
     <link rel="stylesheet" href="./list.css" />
+    <link rel="stylesheet" href="../layout.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="topbar glass">
-        <div>
-          <p class="eyebrow">Admin · Order Management</p>
-          <h1>주문 관리</h1>
+    <div class="page-shell admin-shell">
+      <aside class="admin-sidebar" aria-label="관리자 메뉴">
+        <a class="admin-brand" href="../index.html">
+          <span class="admin-brand-mark">C</span>
+          <span class="admin-brand-name">Cafe Admin</span>
+          <span class="admin-brand-meta">Specialty operations</span>
+        </a>
+        <nav class="admin-nav">
+          <p class="admin-nav-label">Workspace</p>
+          <a class="admin-nav-link" href="../index.html">대시보드</a>
+          <a class="admin-nav-link" href="../menus/list.html">메뉴 관리</a>
+          <a class="admin-nav-link is-active" href="./list.html">주문 관리</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+          <a class="admin-nav-link" href="../../index.html">고객 화면</a>
         </div>
-        <a class="secondary-link" href="../index.html">← 대시보드</a>
-      </header>
+      </aside>
 
-      <main class="container page-content">
-        <section class="summary-grid">
-          <article class="summary-card glass">
-            <span>전체 주문</span>
-            <strong id="totalCount">0</strong>
-          </article>
-          <article class="summary-card glass">
-            <span>주문접수</span>
-            <strong id="receivedCount">0</strong>
-          </article>
-          <article class="summary-card glass">
-            <span>준비중</span>
-            <strong id="preparingCount">0</strong>
-          </article>
-          <article class="summary-card glass">
-            <span>완료</span>
-            <strong id="doneCount">0</strong>
-          </article>
-        </section>
-
-        <section class="filter-panel glass">
-          <label class="field">
-            <span>상태</span>
-            <select id="statusFilter">
-              <option value="all">전체</option>
-              <option value="주문접수">주문접수</option>
-              <option value="준비중">준비중</option>
-              <option value="완료">완료</option>
-            </select>
-          </label>
-
-          <label class="field field-search">
-            <span>검색</span>
-            <input id="keywordInput" type="search" placeholder="주문 번호로 검색" />
-          </label>
-        </section>
-
-        <section class="list-panel">
-          <div class="list-header">
-            <h2>주문 목록</h2>
-            <p id="resultText">총 0건</p>
+      <div class="admin-main">
+        <header class="admin-header">
+          <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+            <span>Admin</span>
+            <span>주문 관리</span>
+          </nav>
+          <div class="admin-header-row">
+            <div>
+              <p class="eyebrow">Order Management</p>
+              <h1>주문 관리</h1>
+            </div>
+            <div class="admin-header-actions">
+              <a class="secondary-link" href="../index.html">대시보드</a>
+            </div>
           </div>
-          <div id="orderList" class="order-list"></div>
-        </section>
-      </main>
+        </header>
+
+        <main class="container page-content admin-content">
+          <section class="summary-grid">
+            <article class="summary-card glass">
+              <span>전체 주문</span>
+              <strong id="totalCount">0</strong>
+            </article>
+            <article class="summary-card glass">
+              <span>주문접수</span>
+              <strong id="receivedCount">0</strong>
+            </article>
+            <article class="summary-card glass">
+              <span>준비중</span>
+              <strong id="preparingCount">0</strong>
+            </article>
+            <article class="summary-card glass">
+              <span>완료</span>
+              <strong id="doneCount">0</strong>
+            </article>
+          </section>
+
+          <section class="filter-panel glass">
+            <label class="field">
+              <span>상태</span>
+              <select id="statusFilter">
+                <option value="all">전체</option>
+                <option value="주문접수">주문접수</option>
+                <option value="준비중">준비중</option>
+                <option value="완료">완료</option>
+              </select>
+            </label>
+
+            <label class="field field-search">
+              <span>검색</span>
+              <input id="keywordInput" type="search" placeholder="주문 번호로 검색" />
+            </label>
+          </section>
+
+          <section class="list-panel">
+            <div class="list-header">
+              <h2>주문 목록</h2>
+              <p id="resultText">총 0건</p>
+            </div>
+            <div id="orderList" class="order-list"></div>
+          </section>
+        </main>
+      </div>
     </div>
 
     <script src="../../js/data.js"></script>

@@ -6,56 +6,84 @@
     <title>관리자 - 대시보드</title>
     <link rel="stylesheet" href="../css/variables.css" />
     <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./layout.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="topbar glass">
-        <div>
-          <p class="eyebrow">Admin · Dashboard</p>
-          <h1>☕ 카페 앱 관리자</h1>
-        </div>
-        <a class="secondary-link" href="../index.html">고객 화면으로</a>
-      </header>
-
-      <main class="container page-content">
-        <section class="summary-grid">
-          <article class="summary-card glass">
-            <span>전체 주문</span>
-            <strong id="totalOrders">0</strong>
-          </article>
-          <article class="summary-card glass">
-            <span>대기 중 주문</span>
-            <strong id="pendingOrders">0</strong>
-          </article>
-          <article class="summary-card glass">
-            <span>총 매출</span>
-            <strong id="totalRevenue">0원</strong>
-          </article>
-          <article class="summary-card glass">
-            <span>품절 메뉴</span>
-            <strong id="soldOutMenus">0</strong>
-          </article>
-        </section>
-
-        <nav class="quick-nav">
-          <a href="./menus/list.html" class="quick-nav-item glass">
-            <span class="quick-nav-icon">🍰</span>
-            <span class="quick-nav-label">메뉴 관리</span>
-          </a>
-          <a href="./orders/list.html" class="quick-nav-item glass">
-            <span class="quick-nav-icon">🧾</span>
-            <span class="quick-nav-label">주문 관리</span>
-          </a>
+    <div class="page-shell admin-shell">
+      <aside class="admin-sidebar" aria-label="관리자 메뉴">
+        <a class="admin-brand" href="./index.html">
+          <span class="admin-brand-mark">C</span>
+          <span class="admin-brand-name">Cafe Admin</span>
+          <span class="admin-brand-meta">Specialty operations</span>
+        </a>
+        <nav class="admin-nav">
+          <p class="admin-nav-label">Workspace</p>
+          <a class="admin-nav-link is-active" href="./index.html">대시보드</a>
+          <a class="admin-nav-link" href="./menus/list.html">메뉴 관리</a>
+          <a class="admin-nav-link" href="./orders/list.html">주문 관리</a>
         </nav>
+        <div class="admin-sidebar-footer">
+          <a class="admin-nav-link" href="../index.html">고객 화면</a>
+        </div>
+      </aside>
 
-        <section class="list-panel">
-          <div class="list-header">
-            <h2>최근 주문</h2>
-            <a class="secondary-link" href="./orders/list.html">전체 보기</a>
+      <div class="admin-main">
+        <header class="admin-header">
+          <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+            <span>Admin</span>
+            <span>Dashboard</span>
+          </nav>
+          <div class="admin-header-row">
+            <div>
+              <p class="eyebrow">Admin Dashboard</p>
+              <h1>카페 관리자</h1>
+            </div>
+            <div class="admin-header-actions">
+              <a class="secondary-link" href="../index.html">고객 화면으로</a>
+            </div>
           </div>
-          <div id="recentOrders" class="order-list"></div>
-        </section>
-      </main>
+        </header>
+
+        <main class="container page-content admin-content">
+          <section class="summary-grid">
+            <article class="summary-card glass">
+              <span>전체 주문</span>
+              <strong id="totalOrders">0</strong>
+            </article>
+            <article class="summary-card glass">
+              <span>대기 중 주문</span>
+              <strong id="pendingOrders">0</strong>
+            </article>
+            <article class="summary-card glass">
+              <span>총 매출</span>
+              <strong id="totalRevenue">0원</strong>
+            </article>
+            <article class="summary-card glass">
+              <span>품절 메뉴</span>
+              <strong id="soldOutMenus">0</strong>
+            </article>
+          </section>
+
+          <nav class="quick-nav" aria-label="빠른 이동">
+            <a href="./menus/list.html" class="quick-nav-item glass">
+              <span class="quick-nav-icon">M</span>
+              <span class="quick-nav-label">메뉴 관리</span>
+            </a>
+            <a href="./orders/list.html" class="quick-nav-item glass">
+              <span class="quick-nav-icon">O</span>
+              <span class="quick-nav-label">주문 관리</span>
+            </a>
+          </nav>
+
+          <section class="list-panel">
+            <div class="list-header">
+              <h2>최근 주문</h2>
+              <a class="secondary-link" href="./orders/list.html">전체 보기</a>
+            </div>
+            <div id="recentOrders" class="order-list"></div>
+          </section>
+        </main>
+      </div>
     </div>
 
     <script src="../js/data.js"></script>

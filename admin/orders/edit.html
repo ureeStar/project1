@@ -6,14 +6,47 @@
     <title>관리자 - 주문 상태 수정</title>
     <link rel="stylesheet" href="../../css/variables.css" />
     <link rel="stylesheet" href="./edit.css" />
+    <link rel="stylesheet" href="../layout.css" />
   </head>
   <body>
-    <div class="page-shell container">
-      <header class="page-header">
-        <a class="secondary-link" id="backLink" href="./detail.html">← 주문 상세</a>
-      </header>
+    <div class="page-shell admin-shell">
+      <aside class="admin-sidebar" aria-label="관리자 메뉴">
+        <a class="admin-brand" href="../index.html">
+          <span class="admin-brand-mark">C</span>
+          <span class="admin-brand-name">Cafe Admin</span>
+          <span class="admin-brand-meta">Specialty operations</span>
+        </a>
+        <nav class="admin-nav">
+          <p class="admin-nav-label">Workspace</p>
+          <a class="admin-nav-link" href="../index.html">대시보드</a>
+          <a class="admin-nav-link" href="../menus/list.html">메뉴 관리</a>
+          <a class="admin-nav-link is-active" href="./list.html">주문 관리</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+          <a class="admin-nav-link" href="../../index.html">고객 화면</a>
+        </div>
+      </aside>
 
-      <main id="content"></main>
+      <div class="admin-main">
+        <header class="admin-header">
+          <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+            <span>Admin</span>
+            <span>주문 관리</span>
+            <span>상태 수정</span>
+          </nav>
+          <div class="admin-header-row">
+            <div>
+              <p class="eyebrow">Order Status</p>
+              <h1>주문 상태 수정</h1>
+            </div>
+            <div class="admin-header-actions">
+              <a class="secondary-link" id="backLink" href="./detail.html">주문 상세</a>
+            </div>
+          </div>
+        </header>
+
+        <main class="container page-content admin-content" id="content"></main>
+      </div>
     </div>
 
     <script src="../../js/data.js"></script>

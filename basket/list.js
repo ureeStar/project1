@@ -38,14 +38,10 @@ function bindHeaderActions() {
   if (!clearCartBtn) return;
 
   clearCartBtn.addEventListener("click", () => {
-    if (getCart().length === 0) {
-      return;
-    }
+    if (getCart().length === 0) return;
 
     const confirmed = window.confirm("장바구니를 모두 비울까요?");
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     clearCart();
     renderBasketPage();
@@ -56,15 +52,29 @@ function getMenuImage(menu) {
   return menu.image || MENU_IMAGE_FALLBACKS[menu.id] || "";
 }
 
+function getDisplayOptions(item, menu) {
+  if (!menu || menu.categoryId === "dessert") {
+    return { temperature: null, size: null };
+  }
+
+  return {
+    temperature: item.temperature || (menu.categoryId === "ade" ? "ICE" : "HOT"),
+    size: item.size || "Regular",
+  };
+}
+
 function buildCartViewModels() {
   return getCart().map((item) => {
     const menu = getMenuById(item.menuId);
     const category = menu ? getCategoryById(menu.categoryId) : null;
+    const options = getDisplayOptions(item, menu);
 
     return {
       ...item,
       menu,
       category,
+      options,
+      cartKey: getCartItemKey(item.menuId, item),
       linePrice: menu ? menu.price * item.quantity : 0,
     };
   });
@@ -96,7 +106,7 @@ function renderBasketPage() {
       <aside class="summary-panel" aria-label="주문 금액 요약">
         <div class="summary-panel-header">
           <h2>주문 금액 요약</h2>
-          <p>수량과 금액을 한 번에 확인할 수 있습니다.</p>
+          <p>선택한 옵션까지 포함해 한 번에 확인할 수 있습니다.</p>
         </div>
 
         <div class="summary-rows">
@@ -119,7 +129,7 @@ function renderBasketPage() {
         </div>
 
         <button class="checkout-btn" id="checkoutBtn" type="button" ${validItems.length === 0 ? "disabled" : ""}>
-          주문 단계는 5단계에서 구현
+          주문하기
         </button>
         <a class="shop-link" href="../menus/list.html">메뉴 더 담기</a>
         <p class="summary-note">결제와 실제 주문 생성은 다음 단계에서 이어서 구현됩니다.</p>
@@ -156,6 +166,33 @@ function renderEmptyState() {
   `;
 }
 
+function renderItemOptionBadges(item) {
+  const chips = [];
+
+  if (item.options.temperature) {
+    chips.push(`<span class="item-option-chip">${escapeHTML(item.options.temperature)}</span>`);
+  }
+
+  if (item.options.size) {
+    chips.push(`<span class="item-option-chip">${escapeHTML(item.options.size)}</span>`);
+  }
+
+  if (!chips.length) {
+    return "";
+  }
+
+  return `<div class="item-options">${chips.join("")}</div>`;
+}
+
+function renderActionData(item) {
+  return `
+    data-menu-id="${escapeHTML(item.menuId)}"
+    data-temperature="${escapeHTML(item.options.temperature || "")}"
+    data-size="${escapeHTML(item.options.size || "")}"
+    data-cart-key="${escapeHTML(item.cartKey)}"
+  `;
+}
+
 function renderBasketItem(item) {
   if (!item.menu) {
     return `
@@ -166,14 +203,14 @@ function renderBasketItem(item) {
             <div class="basket-item-header">
               <div>
                 <h3 class="item-name">삭제된 메뉴</h3>
-                <p class="item-desc">더 이상 판매하지 않는 메뉴예요. 삭제 후 다시 담아주세요.</p>
+                <p class="item-desc">더 이상 판매하지 않는 메뉴입니다. 목록에서 정리해 주세요.</p>
               </div>
               <span class="item-line-price">-</span>
             </div>
             <div class="item-controls">
               <span class="soldout-chip">주문 불가</span>
               <div class="item-actions">
-                <button class="remove-btn" type="button" data-action="remove" data-menu-id="${item.menuId}">삭제</button>
+                <button class="remove-btn" type="button" data-action="remove" ${renderActionData(item)}>삭제</button>
               </div>
             </div>
           </div>
@@ -203,8 +240,9 @@ function renderBasketItem(item) {
             <div>
               ${item.category ? `<span class="item-category">${escapeHTML(item.category.name)}</span>` : ""}
               <h3 class="item-name">${escapeHTML(item.menu.name)}</h3>
+              ${renderItemOptionBadges(item)}
               <p class="item-desc">${escapeHTML(item.menu.description || "매장에서 준비한 메뉴입니다.")}</p>
-              ${item.menu.soldOut ? `<span class="soldout-chip">현재 품절된 메뉴예요</span>` : ""}
+              ${item.menu.soldOut ? '<span class="soldout-chip">현재 품절된 메뉴예요</span>' : ""}
             </div>
             <span class="item-line-price">${formatPrice(item.linePrice)}</span>
           </div>
@@ -213,15 +251,15 @@ function renderBasketItem(item) {
             <div class="quantity-panel">
               <span class="quantity-label">수량</span>
               <div class="quantity-stepper">
-                <button class="quantity-btn" type="button" data-action="decrease" data-menu-id="${item.menu.id}" aria-label="수량 감소">-</button>
+                <button class="quantity-btn" type="button" data-action="decrease" ${renderActionData(item)} aria-label="수량 감소">-</button>
                 <span class="quantity-value">${item.quantity}</span>
-                <button class="quantity-btn" type="button" data-action="increase" data-menu-id="${item.menu.id}" aria-label="수량 증가">+</button>
+                <button class="quantity-btn" type="button" data-action="increase" ${renderActionData(item)} aria-label="수량 증가">+</button>
               </div>
             </div>
 
             <div class="item-actions">
               <a class="menu-link" href="../menus/detail.html?id=${encodeURIComponent(item.menu.id)}">상세</a>
-              <button class="remove-btn" type="button" data-action="remove" data-menu-id="${item.menu.id}">삭제</button>
+              <button class="remove-btn" type="button" data-action="remove" ${renderActionData(item)}>삭제</button>
             </div>
           </div>
         </div>
@@ -236,34 +274,38 @@ function bindBasketEvents() {
     if (!checkoutBtn) return;
 
     checkoutBtn.addEventListener("click", () => {
-      window.alert("주문 기능은 다음 5단계에서 이어서 구현됩니다.");
+      window.alert("주문 기능은 다음 단계에서 이어서 구현됩니다.");
     });
   });
 }
 
+function readItemOptionsFromDataset(dataset) {
+  return {
+    temperature: dataset.temperature || null,
+    size: dataset.size || null,
+  };
+}
+
 function handleBasketClick(event) {
   const target = event.target.closest("[data-action]");
-  if (!target) {
-    return;
-  }
+  if (!target) return;
 
   const { action, menuId } = target.dataset;
-  if (!menuId) {
-    return;
-  }
+  if (!menuId) return;
 
-  const currentItem = getCart().find((item) => item.menuId === menuId);
+  const options = readItemOptionsFromDataset(target.dataset);
+  const currentItem = getCart().find((item) => getCartItemKey(item.menuId, item) === getCartItemKey(menuId, options));
 
   if (action === "increase" && currentItem) {
-    updateCartItemQuantity(menuId, currentItem.quantity + 1);
+    updateCartItemQuantity(menuId, currentItem.quantity + 1, options);
   }
 
   if (action === "decrease" && currentItem) {
-    updateCartItemQuantity(menuId, currentItem.quantity - 1);
+    updateCartItemQuantity(menuId, currentItem.quantity - 1, options);
   }
 
   if (action === "remove") {
-    removeFromCart(menuId);
+    removeFromCart(menuId, options);
   }
 
   renderBasketPage();

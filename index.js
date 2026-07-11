@@ -5,6 +5,19 @@ const CATEGORY_LABELS = {
   dessert: "Dessert",
 };
 
+const MENU_IMAGE_FALLBACKS = {
+  americano: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1200&q=80",
+  latte: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=1200&q=80",
+  cappuccino: "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=1200&q=80",
+  "vanilla-latte": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=1200&q=80",
+  "earl-grey": "https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=1200&q=80",
+  peppermint: "https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=1200&q=80",
+  "lemon-ade": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&w=1200&q=80",
+  "grapefruit-ade": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=80",
+  cheesecake: "https://images.unsplash.com/photo-1524351199678-941a58a3df50?auto=format&fit=crop&w=1200&q=80",
+  croissant: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=1200&q=80",
+};
+
 const CATEGORY_INITIALS = {
   coffee: "C",
   tea: "N",
@@ -24,14 +37,15 @@ function escapeHTML(value) {
 function renderMenuImage(menu) {
   const initial = CATEGORY_INITIALS[menu.categoryId] || "M";
   const safeInitial = escapeHTML(initial);
+  const imageUrl = menu.image || MENU_IMAGE_FALLBACKS[menu.id] || "";
 
-  if (!menu.image) {
+  if (!imageUrl) {
     return `<div class="featured-card-image" data-initial="${safeInitial}"></div>`;
   }
 
   return `
-    <div class="featured-card-image" data-initial="${safeInitial}">
-      <img src="${escapeHTML(menu.image)}" alt="${escapeHTML(menu.name)}" loading="lazy" />
+    <div class="featured-card-image has-image" data-initial="${safeInitial}" data-menu-id="${escapeHTML(menu.id)}">
+      <img src="${escapeHTML(imageUrl)}" alt="${escapeHTML(menu.name)}" loading="lazy" />
     </div>
   `;
 }

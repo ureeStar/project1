@@ -215,10 +215,23 @@ body {
   gap: var(--space-sm);
 }
 
+.option-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
 .option-title {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   font-weight: 900;
+}
+
+.option-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
 }
 
 .segmented-control {
@@ -231,11 +244,20 @@ body {
   border-radius: var(--radius-full);
 }
 
+.segmented-control.is-single {
+  grid-template-columns: 1fr;
+}
+
 .segmented-control button {
   min-height: 42px;
   border-radius: var(--radius-full);
   color: var(--color-text-muted);
   font-weight: 900;
+}
+
+.segmented-control button:disabled {
+  opacity: 1;
+  cursor: default;
 }
 
 .segmented-control button.selected {
@@ -485,6 +507,12 @@ body {
 
   .menu-meta div {
     grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+
+  .option-heading {
+    align-items: start;
+    flex-direction: column;
     gap: var(--space-xs);
   }
 

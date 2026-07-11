@@ -39,10 +39,105 @@ function getCategoryLabel(categoryId) {
   return CATEGORY_LABELS[categoryId] || (category ? category.name : "Seasonal");
 }
 
+function isDessertMenu(menu) {
+  return menu?.categoryId === "dessert";
+}
+
+function isAdeMenu(menu) {
+  return menu?.categoryId === "ade";
+}
+
+function getDefaultOptions(menu) {
+  if (isDessertMenu(menu)) {
+    return { temperature: null, size: null };
+  }
+
+  return {
+    temperature: isAdeMenu(menu) ? "ICE" : "HOT",
+    size: "Regular",
+  };
+}
+
+function renderOptionButton(label, value, isSelected, isLocked = false) {
+  return `
+    <button
+      type="button"
+      data-option-value="${escapeHTML(value)}"
+      ${isSelected ? 'class="selected"' : ""}
+      ${isLocked ? "disabled" : ""}
+      ${isSelected ? 'aria-pressed="true"' : 'aria-pressed="false"'}
+    >${escapeHTML(label)}</button>
+  `;
+}
+
+function renderTemperatureControl(menu) {
+  if (isDessertMenu(menu)) {
+    return "";
+  }
+
+  const defaultOptions = getDefaultOptions(menu);
+
+  if (isAdeMenu(menu)) {
+    return `
+      <div class="option-group">
+        <div class="option-heading">
+          <span class="option-title">온도</span>
+          <span class="option-hint">에이드는 아이스만 제공됩니다</span>
+        </div>
+        <div class="segmented-control is-single" aria-label="온도 옵션" data-option-group="temperature">
+          ${renderOptionButton("ICE", defaultOptions.temperature, true, true)}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="option-group">
+      <span class="option-title">온도</span>
+      <div class="segmented-control" aria-label="온도 옵션" data-option-group="temperature">
+        ${renderOptionButton("Hot", "HOT", defaultOptions.temperature === "HOT")}
+        ${renderOptionButton("Ice", "ICE", defaultOptions.temperature === "ICE")}
+      </div>
+    </div>
+  `;
+}
+
+function renderSizeControl(menu) {
+  if (isDessertMenu(menu)) {
+    return "";
+  }
+
+  const defaultOptions = getDefaultOptions(menu);
+
+  return `
+    <div class="option-group">
+      <span class="option-title">사이즈</span>
+      <div class="segmented-control" aria-label="사이즈 옵션" data-option-group="size">
+        ${renderOptionButton("Regular", "Regular", defaultOptions.size === "Regular")}
+        ${renderOptionButton("Large", "Large", defaultOptions.size === "Large")}
+      </div>
+    </div>
+  `;
+}
+
+function getSelectedOptionValue(groupName) {
+  const selected = document.querySelector(`[data-option-group="${groupName}"] button.selected`);
+  return selected?.dataset.optionValue || null;
+}
+
+function getSelectedCartOptions() {
+  const defaults = getDefaultOptions(currentMenu);
+  return {
+    temperature: getSelectedOptionValue("temperature") || defaults.temperature,
+    size: getSelectedOptionValue("size") || defaults.size,
+  };
+}
+
 function init() {
   const params = new URLSearchParams(window.location.search);
   const menuId = params.get("id");
   currentMenu = menuId ? getMenuById(menuId) : null;
+  quantity = 1;
 
   renderMenuDetail();
   updateCartBadge();
@@ -68,7 +163,7 @@ function renderMenuDetail() {
     <section class="detail-layout">
       <div class="menu-detail-image">
         <img src="${escapeHTML(getMenuImage(currentMenu))}" alt="${escapeHTML(currentMenu.name)}" />
-        ${soldOut ? `<span class="menu-detail-soldout">품절</span>` : ""}
+        ${soldOut ? '<span class="menu-detail-soldout">Sold out</span>' : ""}
       </div>
 
       <div class="menu-detail-body">
@@ -76,16 +171,16 @@ function renderMenuDetail() {
         <span class="menu-detail-category">${escapeHTML(getCategoryLabel(currentMenu.categoryId))}</span>
         <h1 class="menu-detail-name">${escapeHTML(currentMenu.name)}</h1>
         <p class="menu-detail-price">${formatPrice(Number(currentMenu.price) || 0)}</p>
-        <p class="menu-detail-desc">${escapeHTML(currentMenu.description || "매장에서 준비한 메뉴입니다.")}</p>
+        <p class="menu-detail-desc">${escapeHTML(currentMenu.description || "매장에서 준비한 오늘의 메뉴입니다.")}</p>
 
         <dl class="menu-meta">
           <div>
             <dt>구성</dt>
-            <dd>매장에서 제조 후 바로 픽업</dd>
+            <dd>주문 즉시 정성스럽게 준비해 드립니다</dd>
           </div>
           <div>
-            <dt>알레르기</dt>
-            <dd>우유, 견과류 취급 공간에서 제조</dd>
+            <dt>안내</dt>
+            <dd>알레르기 정보와 재고 상황은 매장 기준으로 운영됩니다</dd>
           </div>
         </dl>
 
@@ -113,7 +208,7 @@ function renderSoldOutNotice() {
   return `
     <div class="soldout-panel">
       <strong>지금은 준비가 끝난 메뉴입니다.</strong>
-      <p>다른 추천 메뉴를 둘러보거나 나중에 다시 확인해주세요.</p>
+      <p>다른 추천 메뉴를 둘러보거나, 다음 방문 때 다시 확인해 주세요.</p>
     </div>
   `;
 }
@@ -121,21 +216,8 @@ function renderSoldOutNotice() {
 function renderOrderControls() {
   return `
     <section class="order-panel" aria-label="주문 옵션">
-      <div class="option-group">
-        <span class="option-title">온도</span>
-        <div class="segmented-control" aria-label="온도 옵션">
-          <button class="selected" type="button">Hot</button>
-          <button type="button">Ice</button>
-        </div>
-      </div>
-
-      <div class="option-group">
-        <span class="option-title">사이즈</span>
-        <div class="segmented-control" aria-label="사이즈 옵션">
-          <button class="selected" type="button">Regular</button>
-          <button type="button">Large</button>
-        </div>
-      </div>
+      ${renderTemperatureControl(currentMenu)}
+      ${renderSizeControl(currentMenu)}
 
       <div class="quantity-stepper">
         <span class="option-title">수량</span>
@@ -169,7 +251,7 @@ function renderRecommendedMenus() {
     .slice(0, 3);
 
   if (!menus.length) {
-    return `<p class="empty-state">추천 가능한 메뉴가 없습니다.</p>`;
+    return '<p class="empty-state">추천 가능한 메뉴가 없습니다.</p>';
   }
 
   return menus
@@ -192,10 +274,12 @@ function bindOptionEvents() {
       if (!(event.target instanceof Element)) return;
 
       const button = event.target.closest("button");
-      if (!button) return;
+      if (!button || button.disabled) return;
 
       control.querySelectorAll("button").forEach((item) => {
-        item.classList.toggle("selected", item === button);
+        const isSelected = item === button;
+        item.classList.toggle("selected", isSelected);
+        item.setAttribute("aria-pressed", isSelected ? "true" : "false");
       });
     });
   });
@@ -236,7 +320,7 @@ function bindAddToCartEvent() {
   if (!addToCartBtn) return;
 
   addToCartBtn.addEventListener("click", () => {
-    addToCart(currentMenu.id, quantity);
+    addToCart(currentMenu.id, quantity, getSelectedCartOptions());
     updateCartBadge();
 
     const originalText = addToCartBtn.textContent;

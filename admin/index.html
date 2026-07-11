@@ -4,15 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>관리자 - 대시보드</title>
-    <base href="/admin/" />
     <script>
-      if (location.protocol !== "file:" && !location.pathname.endsWith("/") && !location.pathname.endsWith(".html")) {
-        location.replace(`${location.pathname}/${location.search}${location.hash}`);
-      }
+      (() => {
+        const path = location.pathname;
+        const baseUrl = path.endsWith("/") || path.endsWith(".html")
+          ? new URL("./", location.href)
+          : new URL(`${path}/`, location.origin);
+        const base = document.createElement("base");
+        base.href = baseUrl.href;
+        document.head.appendChild(base);
+      })();
     </script>
     <link rel="stylesheet" href="../css/variables.css" />
     <link rel="stylesheet" href="./index.css" />
-    <link rel="stylesheet" href="./layout.css" />
+    <script>
+      (() => {
+        const layoutStyle = document.createElement("link");
+        layoutStyle.rel = "stylesheet";
+        layoutStyle.href = "./layout.css";
+        document.head.appendChild(layoutStyle);
+      })();
+    </script>
   </head>
   <body>
     <div class="page-shell admin-shell">

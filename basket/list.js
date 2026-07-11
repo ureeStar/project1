@@ -6,7 +6,7 @@ const MENU_IMAGE_FALLBACKS = {
   "earl-grey": "https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=900&q=80",
   peppermint: "https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=900&q=80",
   "lemon-ade": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&w=900&q=80",
-  "grapefruit-ade": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=80",
+  "grapefruit-ade": "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=900&q=80",
   cheesecake: "https://images.unsplash.com/photo-1524351199678-941a58a3df50?auto=format&fit=crop&w=900&q=80",
   croissant: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=900&q=80",
 };
@@ -187,8 +187,8 @@ function renderItemOptionBadges(item) {
 function renderActionData(item) {
   return `
     data-menu-id="${escapeHTML(item.menuId)}"
-    data-temperature="${escapeHTML(item.options.temperature || "")}"
-    data-size="${escapeHTML(item.options.size || "")}"
+    data-temperature="${escapeHTML(item.temperature || "")}"
+    data-size="${escapeHTML(item.size || "")}"
     data-cart-key="${escapeHTML(item.cartKey)}"
   `;
 }
@@ -290,11 +290,13 @@ function handleBasketClick(event) {
   const target = event.target.closest("[data-action]");
   if (!target) return;
 
-  const { action, menuId } = target.dataset;
+  const { action, cartKey, menuId } = target.dataset;
   if (!menuId) return;
 
-  const options = readItemOptionsFromDataset(target.dataset);
-  const currentItem = getCart().find((item) => getCartItemKey(item.menuId, item) === getCartItemKey(menuId, options));
+  const currentItem = getCart().find((item) => getCartItemKey(item.menuId, item) === cartKey);
+  const options = currentItem
+    ? { temperature: currentItem.temperature, size: currentItem.size }
+    : readItemOptionsFromDataset(target.dataset);
 
   if (action === "increase" && currentItem) {
     updateCartItemQuantity(menuId, currentItem.quantity + 1, options);

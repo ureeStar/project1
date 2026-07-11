@@ -46,45 +46,91 @@
         </header>
 
         <main class="container page-content admin-content">
-          <section class="form-card">
-            <form id="menuForm" class="menu-form">
-              <div class="field-grid">
-                <label class="field">
-                  <span>메뉴 ID</span>
-                  <input name="id" type="text" placeholder="비워두면 자동 생성" />
-                </label>
-                <label class="field">
-                  <span>카테고리</span>
-                  <select name="categoryId" id="categorySelect" required></select>
-                </label>
-                <label class="field">
-                  <span>메뉴명</span>
-                  <input name="name" type="text" required />
-                </label>
-                <label class="field">
-                  <span>가격</span>
-                  <input name="price" type="number" min="0" step="100" required />
-                </label>
+          <div class="form-layout">
+            <section class="form-card">
+              <div class="form-heading">
+                <h2>메뉴 정보</h2>
+                <p>입력 내용을 저장하기 전에 오른쪽 미리보기에서 노출 상태를 확인하세요.</p>
               </div>
 
-              <label class="field">
-                <span>설명</span>
-                <textarea name="description" rows="4"></textarea>
-              </label>
+              <form id="menuForm" class="menu-form" novalidate>
+                <div class="field-grid">
+                  <label class="field">
+                    <span class="field-label">메뉴 ID</span>
+                    <input name="id" type="text" placeholder="비워두면 자동 생성" />
+                    <small class="field-helper">직접 입력하지 않으면 이름 기반 ID가 자동으로 만들어집니다.</small>
+                  </label>
 
-              <label class="checkbox-field">
-                <input name="soldOut" type="checkbox" />
-                <span>품절 상태로 등록</span>
-              </label>
+                  <label class="field">
+                    <span class="field-label">카테고리</span>
+                    <select name="categoryId" id="categorySelect" required></select>
+                    <small class="field-helper">고객 화면에서 노출될 분류를 선택합니다.</small>
+                  </label>
 
-              <p id="message" class="message" aria-live="polite"></p>
+                  <label class="field">
+                    <span class="field-label">메뉴명</span>
+                    <input name="name" type="text" maxlength="30" required />
+                    <small class="field-helper">고객이 바로 이해할 수 있는 짧은 이름이 좋습니다.</small>
+                  </label>
 
-              <div class="form-actions">
-                <button class="secondary-button" type="button" id="cancelButton">취소</button>
-                <button class="primary-button" type="submit">등록하기</button>
+                  <label class="field">
+                    <span class="field-label">가격</span>
+                    <input name="price" type="number" min="0" step="100" required />
+                    <small class="field-helper">0원 이상, 100원 단위 입력을 권장합니다.</small>
+                  </label>
+                </div>
+
+                <label class="field">
+                  <span class="field-label">이미지 경로</span>
+                  <input name="image" type="text" placeholder="../assets/menu-latte.jpg" />
+                  <small class="field-helper">로컬 경로나 배포 가능한 이미지 URL을 입력합니다.</small>
+                </label>
+
+                <label class="field">
+                  <span class="field-label">설명</span>
+                  <textarea name="description" rows="5" maxlength="200"></textarea>
+                  <small class="field-helper">원두, 맛, 추천 상황 같은 핵심 정보를 1~2문장으로 정리하세요.</small>
+                </label>
+
+                <label class="checkbox-field">
+                  <input name="soldOut" type="checkbox" />
+                  <span>품절 상태로 등록</span>
+                </label>
+
+                <p id="message" class="message" aria-live="polite"></p>
+
+                <div class="form-actions">
+                  <button class="secondary-button" type="button" id="cancelButton">취소</button>
+                  <button class="primary-button" type="submit">등록하기</button>
+                </div>
+              </form>
+            </section>
+
+            <aside class="preview-panel glass" aria-label="메뉴 미리보기">
+              <div class="preview-media" id="previewMedia">
+                <div class="preview-placeholder">Image Preview</div>
               </div>
-            </form>
-          </section>
+              <div class="preview-copy">
+                <div class="preview-badges">
+                  <span class="badge category" id="previewCategory">카테고리</span>
+                  <span class="badge active" id="previewStatus">판매 중</span>
+                </div>
+                <h2 id="previewName">메뉴 이름</h2>
+                <p class="preview-price" id="previewPrice">0원</p>
+                <p class="preview-description" id="previewDescription">설명이 아직 입력되지 않았습니다.</p>
+                <div class="preview-meta">
+                  <div class="preview-meta-item">
+                    <span>메뉴 ID</span>
+                    <strong id="previewId">자동 생성</strong>
+                  </div>
+                  <div class="preview-meta-item">
+                    <span>이미지 경로</span>
+                    <strong id="previewImagePath">미등록</strong>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
         </main>
       </div>
     </div>

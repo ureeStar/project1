@@ -61,23 +61,55 @@
           </section>
 
           <section class="filter-panel glass">
-            <label class="field">
-              <span>카테고리</span>
-              <select id="categoryFilter"></select>
-            </label>
+            <div class="filter-head">
+              <div>
+                <p class="panel-eyebrow">Browse</p>
+                <h2>필터와 보기 방식</h2>
+              </div>
+              <div class="view-toggle" role="tablist" aria-label="메뉴 보기 방식">
+                <button class="view-button is-active" id="cardViewButton" type="button" data-view="card">카드</button>
+                <button class="view-button" id="tableViewButton" type="button" data-view="table">표</button>
+              </div>
+            </div>
 
-            <label class="field field-search">
-              <span>검색</span>
-              <input id="keywordInput" type="search" placeholder="메뉴명 또는 설명 검색" />
-            </label>
+            <div class="filter-grid">
+              <label class="field">
+                <span>카테고리</span>
+                <select id="categoryFilter"></select>
+              </label>
+
+              <label class="field field-search">
+                <span>검색</span>
+                <input id="keywordInput" type="search" placeholder="메뉴명 또는 설명 검색" />
+              </label>
+            </div>
           </section>
 
           <section class="list-panel">
             <div class="list-header">
-              <h2>메뉴 목록</h2>
-              <p id="resultText">총 0개</p>
+              <div>
+                <h2>메뉴 목록</h2>
+                <p id="resultText">총 0개</p>
+              </div>
             </div>
+
             <div id="menuList" class="menu-list"></div>
+
+            <div class="menu-table-shell glass" id="menuTableShell" hidden>
+              <table class="menu-table">
+                <thead>
+                  <tr>
+                    <th>메뉴</th>
+                    <th>카테고리</th>
+                    <th>가격</th>
+                    <th>상태</th>
+                    <th>이미지</th>
+                    <th>작업</th>
+                  </tr>
+                </thead>
+                <tbody id="menuTableBody"></tbody>
+              </table>
+            </div>
           </section>
         </main>
       </div>

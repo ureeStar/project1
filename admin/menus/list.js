@@ -1,5 +1,6 @@
 const categoryFilter = document.getElementById("categoryFilter");
 const keywordInput = document.getElementById("keywordInput");
+const menuListPanel = document.getElementById("menuListPanel");
 const menuList = document.getElementById("menuList");
 const menuTableShell = document.getElementById("menuTableShell");
 const menuTableBody = document.getElementById("menuTableBody");
@@ -24,7 +25,7 @@ function getFilteredMenus() {
 
   return getAllMenus().filter((menu) => {
     const matchesCategory = categoryId === "all" || menu.categoryId === categoryId;
-    const source = `${menu.name} ${menu.description} ${menu.id}`.toLowerCase();
+    const source = `${menu.name} ${menu.description || ""} ${menu.id}`.toLowerCase();
     const matchesKeyword = !keyword || source.includes(keyword);
     return matchesCategory && matchesKeyword;
   });
@@ -126,7 +127,7 @@ function renderTableList(menus) {
       const category = getCategoryById(menu.categoryId);
       return `
         <tr>
-          <td>
+          <td data-label="메뉴">
             <div class="table-menu-cell">
               ${renderImageMedia(menu.image, menu.name, "table-menu-thumb")}
               <div>
@@ -135,16 +136,19 @@ function renderTableList(menus) {
               </div>
             </div>
           </td>
-          <td>${category ? category.name : "미분류"}</td>
-          <td>${formatPrice(menu.price)}</td>
-          <td><span class="badge ${menu.soldOut ? "soldout" : "active"}">${menu.soldOut ? "품절" : "판매 중"}</span></td>
-          <td>${menu.image || "미등록"}</td>
-          <td>
+          <td data-label="카테고리">${category ? category.name : "미분류"}</td>
+          <td data-label="가격">${formatPrice(menu.price)}</td>
+          <td data-label="상태"><span class="badge ${menu.soldOut ? "soldout" : "active"}">${menu.soldOut ? "품절" : "판매 중"}</span></td>
+          <td data-label="이미지">${menu.image || "미등록"}</td>
+          <td data-label="작업">
             <div class="table-action-group">
               <a class="action-button" href="./detail.html?id=${encodeURIComponent(menu.id)}">상세</a>
               <a class="action-button" href="./edit.html?id=${encodeURIComponent(menu.id)}">수정</a>
               <button class="action-button" type="button" data-action="toggle" data-id="${menu.id}">
                 ${menu.soldOut ? "재개" : "품절"}
+              </button>
+              <button class="action-button warn" type="button" data-action="delete" data-id="${menu.id}">
+                삭제
               </button>
             </div>
           </td>
@@ -156,11 +160,19 @@ function renderTableList(menus) {
 
 function updateViewState() {
   const isCardView = currentView === "card";
+
+  menuListPanel.dataset.view = currentView;
   menuList.hidden = !isCardView;
   menuTableShell.hidden = isCardView;
+  menuList.classList.toggle("is-visible", isCardView);
+  menuList.classList.toggle("is-hidden", !isCardView);
+  menuTableShell.classList.toggle("is-visible", !isCardView);
+  menuTableShell.classList.toggle("is-hidden", isCardView);
 
   viewButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.view === currentView);
+    const isActive = button.dataset.view === currentView;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
   });
 }
 
@@ -204,8 +216,11 @@ function handleViewChange(event) {
   const button = event.target.closest("[data-view]");
   if (!button) return;
 
-  currentView = button.dataset.view || "card";
-  updateViewState();
+  const nextView = button.dataset.view || "card";
+  if (nextView === currentView) return;
+
+  currentView = nextView;
+  renderList();
 }
 
 function initializePage() {

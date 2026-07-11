@@ -67,8 +67,26 @@
                 <h2>필터와 보기 방식</h2>
               </div>
               <div class="view-toggle" role="tablist" aria-label="메뉴 보기 방식">
-                <button class="view-button is-active" id="cardViewButton" type="button" data-view="card">카드</button>
-                <button class="view-button" id="tableViewButton" type="button" data-view="table">표</button>
+                <button
+                  class="view-button is-active"
+                  id="cardViewButton"
+                  type="button"
+                  data-view="card"
+                  aria-controls="menuList"
+                  aria-selected="true"
+                >
+                  카드
+                </button>
+                <button
+                  class="view-button"
+                  id="tableViewButton"
+                  type="button"
+                  data-view="table"
+                  aria-controls="menuTableShell"
+                  aria-selected="false"
+                >
+                  표
+                </button>
               </div>
             </div>
 
@@ -85,7 +103,7 @@
             </div>
           </section>
 
-          <section class="list-panel">
+          <section class="list-panel" id="menuListPanel" data-view="card">
             <div class="list-header">
               <div>
                 <h2>메뉴 목록</h2>
@@ -93,9 +111,9 @@
               </div>
             </div>
 
-            <div id="menuList" class="menu-list"></div>
+            <div id="menuList" class="menu-list is-visible"></div>
 
-            <div class="menu-table-shell glass" id="menuTableShell" hidden>
+            <div class="menu-table-shell glass is-hidden" id="menuTableShell" hidden>
               <table class="menu-table">
                 <thead>
                   <tr>

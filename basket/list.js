@@ -33,6 +33,32 @@ function init() {
   renderBasketPage();
 }
 
+function getCheckoutNoticeElement() {
+  let noticeEl = document.getElementById("checkoutNotice");
+
+  if (!noticeEl) {
+    noticeEl = document.createElement("p");
+    noticeEl.id = "checkoutNotice";
+    noticeEl.className = "checkout-notice";
+    noticeEl.setAttribute("role", "status");
+    noticeEl.setAttribute("aria-live", "polite");
+    document.body.appendChild(noticeEl);
+  }
+
+  return noticeEl;
+}
+
+function showCheckoutNotice(message) {
+  const noticeEl = getCheckoutNoticeElement();
+  noticeEl.textContent = message;
+  noticeEl.classList.add("is-visible");
+
+  window.clearTimeout(showCheckoutNotice.hideTimer);
+  showCheckoutNotice.hideTimer = window.setTimeout(() => {
+    noticeEl.classList.remove("is-visible");
+  }, 2500);
+}
+
 function bindHeaderActions() {
   const clearCartBtn = document.getElementById("clearCartBtn");
   if (!clearCartBtn) return;
@@ -155,6 +181,40 @@ function renderBasketPage() {
   bindBasketEvents();
 }
 
+function generateOrderId(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dateKey = `${year}${month}${day}`;
+  const orderCount = getOrders().filter((order) => String(order.id).includes(`ORD-${dateKey}`)).length + 1;
+  return `ORD-${dateKey}-${String(orderCount).padStart(3, "0")}`;
+}
+
+function createOrderFromCart() {
+  const cartItems = buildCartViewModels().filter((item) => item.menu);
+  if (!cartItems.length) {
+    return null;
+  }
+
+  const now = new Date();
+  const nextOrder = {
+    id: generateOrderId(now),
+    createdAt: now.toISOString(),
+    status: ORDER_STATUSES[0],
+    items: cartItems.map((item) => ({
+      menuId: item.menuId,
+      quantity: item.quantity,
+      temperature: item.temperature || null,
+      size: item.size || null,
+    })),
+  };
+
+  saveOrders([nextOrder, ...getOrders()]);
+  clearCart();
+
+  return nextOrder;
+}
+
 function renderEmptyState() {
   return `
     <section class="empty-state">
@@ -273,10 +333,23 @@ function bindBasketEvents() {
     const checkoutBtn = document.getElementById(id);
     if (!checkoutBtn) return;
 
-    checkoutBtn.addEventListener("click", () => {
-      window.alert("주문 기능은 다음 단계에서 이어서 구현됩니다.");
-    });
+    checkoutBtn.addEventListener("click", handleCheckout);
   });
+}
+
+function handleCheckout() {
+  const order = createOrderFromCart();
+  if (!order) {
+    renderBasketPage();
+    return;
+  }
+
+  renderBasketPage();
+  showCheckoutNotice("주문이 완료되었습니다.");
+
+  window.setTimeout(() => {
+    window.location.href = "../orders/list.html";
+  }, 2500);
 }
 
 function readItemOptionsFromDataset(dataset) {

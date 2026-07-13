@@ -428,7 +428,8 @@ body.subpage-with-gnb {
 }
 
 .site-header-subpage {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 20;
   color: var(--color-text);
   background: rgba(255, 253, 248, 0.94);
@@ -451,8 +452,8 @@ body.subpage-with-gnb {
 }
 
 .brand-symbol {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
@@ -471,7 +472,7 @@ body.subpage-with-gnb {
 
 .brand-mark strong {
   font-family: var(--font-serif);
-  font-size: 1.12rem;
+  font-size: 1.06rem;
 }
 
 .brand-mark small {
@@ -489,13 +490,13 @@ body.subpage-with-gnb {
 }
 
 .site-nav-link {
-  min-height: 36px;
+  min-height: 34px;
   display: inline-flex;
   align-items: center;
   padding: 0 var(--space-md);
   border-radius: var(--radius-full);
   font-family: var(--font-ui);
-  font-size: var(--font-size-sm);
+  font-size: 0.82rem;
   font-weight: 700;
   color: currentColor;
 }
@@ -507,7 +508,7 @@ body.subpage-with-gnb {
 
 .cart-link {
   position: relative;
-  min-height: 42px;
+  min-height: 40px;
   justify-content: center;
   padding: 0 var(--space-lg);
   border: 1px solid currentColor;

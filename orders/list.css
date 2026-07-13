@@ -1,12 +1,12 @@
 /* ===== Page Header ===== */
 .page-header {
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: var(--header-height);
+  height: 56px;
   padding: 0 var(--space-md);
   border-radius: 0;
   border-top: none;
@@ -15,7 +15,7 @@
 }
 
 .page-header h1 {
-  font-size: var(--font-size-lg);
+  font-size: 1rem;
   font-weight: 700;
 }
 

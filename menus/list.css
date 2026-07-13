@@ -231,7 +231,7 @@ body {
 .recommend-card {
   min-width: 0;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-sm);
@@ -275,7 +275,8 @@ body {
 }
 
 .quick-cart-button,
-.card-cart-button {
+.card-cart-button,
+.wishlist-button {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
@@ -293,9 +294,31 @@ body {
   width: 42px;
 }
 
+.wishlist-button {
+  width: 42px;
+  color: var(--color-primary);
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px solid var(--color-line);
+}
+
+.menu-card-image .wishlist-button {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 2;
+}
+
+.wishlist-button.is-active {
+  color: var(--color-text-inverse);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
 .quick-cart-button:hover,
-.card-cart-button:hover:not(:disabled) {
+.card-cart-button:hover:not(:disabled),
+.wishlist-button:hover {
   background: var(--color-primary-hover);
+  color: var(--color-text-inverse);
   transform: translateY(-1px);
 }
 

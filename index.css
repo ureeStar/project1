@@ -86,9 +86,9 @@ main,
   top: 0;
   z-index: 20;
   min-height: var(--header-height);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-md);
   padding: 0 var(--page-gutter);
   color: var(--color-text-inverse);
@@ -113,6 +113,7 @@ main,
 .brand-mark,
 .site-nav,
 .cart-link,
+.header-auth,
 .hero-actions,
 .section-heading,
 .footer-inner,
@@ -160,9 +161,17 @@ main,
 
 .site-nav {
   gap: var(--space-xs);
+  justify-self: center;
+  min-width: 0;
+  overflow-x: auto;
   padding: 4px;
   border: 1px solid rgba(255, 253, 248, 0.28);
   border-radius: var(--radius-full);
+  scrollbar-width: none;
+}
+
+.site-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .site-header.scrolled .site-nav {
@@ -195,12 +204,17 @@ main,
   position: relative;
   min-height: 42px;
   justify-content: center;
+  justify-self: end;
   padding: 0 var(--space-lg);
   border: 1px solid currentColor;
   border-radius: var(--radius-full);
   font-family: var(--font-ui);
   font-size: var(--font-size-sm);
   font-weight: 800;
+}
+
+.header-auth {
+  justify-self: end;
 }
 
 .cart-badge {
@@ -814,7 +828,15 @@ main,
 
 @media (max-width: 1023px) {
   .site-nav {
-    display: none;
+    gap: 4px;
+    justify-self: stretch;
+    padding: 3px;
+  }
+
+  .site-nav-link {
+    min-height: 32px;
+    padding: 0 var(--space-sm);
+    font-size: 0.78rem;
   }
 
   .featured-grid,
@@ -872,6 +894,10 @@ main,
   }
 
   .brand-mark small {
+    display: none;
+  }
+
+  .site-nav {
     display: none;
   }
 

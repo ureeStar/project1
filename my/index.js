@@ -117,6 +117,32 @@ function updateCartBadge() {
   });
 }
 
+function renderProfile() {
+  const user = getCurrentUser();
+  const avatarEl = document.querySelector(".profile-avatar");
+  const nameEl = document.querySelector(".profile-name");
+  const descEl = document.querySelector(".profile-desc");
+  const titleEl = document.querySelector(".welcome-title");
+  const textEl = document.querySelector(".welcome-text");
+  const authActionLabel = document.getElementById("authActionLabel");
+
+  if (user) {
+    const displayName = user.name || "회원";
+    if (avatarEl) avatarEl.textContent = displayName.slice(0, 1).toUpperCase();
+    if (nameEl) nameEl.textContent = `${displayName}님`;
+    if (descEl) descEl.textContent = "오늘도 취향에 맞는 메뉴를 이어서 즐겨보세요.";
+    if (titleEl) titleEl.textContent = `${displayName}님, 반가워요.`;
+    if (textEl) textEl.textContent = "최근 주문, 장바구니, 찜 목록을 한 곳에서 확인할 수 있습니다.";
+    if (authActionLabel) authActionLabel.textContent = "로그아웃";
+    return;
+  }
+
+  if (avatarEl) avatarEl.textContent = "G";
+  if (nameEl) nameEl.textContent = "게스트님";
+  if (descEl) descEl.textContent = "로그인하면 찜 목록과 주문 흐름을 이어서 사용할 수 있어요.";
+  if (authActionLabel) authActionLabel.textContent = "로그인";
+}
+
 function handleInfoClick(event) {
   const button = event.target.closest("[data-info]");
   if (!button) return;
@@ -127,7 +153,21 @@ function handleInfoClick(event) {
   }
 }
 
+function handleAuthAction() {
+  if (isLoggedIn()) {
+    logoutCurrentUser();
+    showAppToast("로그아웃되었습니다.");
+    renderProfile();
+    return;
+  }
+
+  setRedirectAfterLogin(window.location.href);
+  window.location.href = "../auth/login.html";
+}
+
 function init() {
+  initializeSharedCustomerUI();
+  renderProfile();
   renderCartSummary();
   renderRecentOrder();
   renderStamps();
@@ -136,6 +176,11 @@ function init() {
   document.querySelectorAll("[data-info]").forEach((button) => {
     button.addEventListener("click", handleInfoClick);
   });
+
+  const authActionBtn = document.getElementById("authActionBtn");
+  if (authActionBtn) {
+    authActionBtn.addEventListener("click", handleAuthAction);
+  }
 }
 
 init();

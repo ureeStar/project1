@@ -28,6 +28,7 @@ function escapeHTML(value) {
 }
 
 function init() {
+  initializeSharedCustomerUI();
   bindHeaderActions();
   document.getElementById("basketContent").addEventListener("click", handleBasketClick);
   renderBasketPage();
@@ -355,6 +356,14 @@ function bindBasketEvents() {
 }
 
 function handleCheckout() {
+  if (!isLoggedIn()) {
+    showLoginRequiredModal({
+      title: "로그인이 필요해요",
+      message: "주문하려면 로그인이 필요합니다. 담아둔 메뉴는 로그인 후에도 유지됩니다.",
+    });
+    return;
+  }
+
   const order = createOrderFromCart();
   if (!order) {
     renderBasketPage();

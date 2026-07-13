@@ -134,6 +134,7 @@ function getSelectedCartOptions() {
 }
 
 function init() {
+  initializeSharedCustomerUI();
   const params = new URLSearchParams(window.location.search);
   const menuId = params.get("id");
   currentMenu = menuId ? getMenuById(menuId) : null;
@@ -168,6 +169,7 @@ function renderMenuDetail() {
 
       <div class="menu-detail-body">
         <a class="back-link" href="list.html">메뉴 목록</a>
+        ${renderWishlistButton(currentMenu)}
         <span class="menu-detail-category">${escapeHTML(getCategoryLabel(currentMenu.categoryId))}</span>
         <h1 class="menu-detail-name">${escapeHTML(currentMenu.name)}</h1>
         <p class="menu-detail-price">${formatPrice(Number(currentMenu.price) || 0)}</p>
@@ -197,11 +199,30 @@ function renderMenuDetail() {
     </section>
   `;
 
+  bindWishlistEvent();
+
   if (!soldOut) {
     bindOptionEvents();
     bindQuantityEvents();
     bindAddToCartEvent();
   }
+}
+
+function renderWishlistButton(menu) {
+  const wishlisted = isWishlisted(menu.id);
+
+  return `
+    <button
+      class="detail-wishlist-button${wishlisted ? " is-active" : ""}"
+      type="button"
+      id="detailWishlistBtn"
+      aria-label="${escapeHTML(menu.name)} 찜하기"
+      aria-pressed="${wishlisted}"
+    >
+      <span aria-hidden="true">${wishlisted ? "♥" : "♡"}</span>
+      <span>${wishlisted ? "찜 해제" : "찜하기"}</span>
+    </button>
+  `;
 }
 
 function renderSoldOutNotice() {
@@ -266,6 +287,31 @@ function renderRecommendedMenus() {
       `
     )
     .join("");
+}
+
+function bindWishlistEvent() {
+  const wishlistBtn = document.getElementById("detailWishlistBtn");
+  if (!wishlistBtn || !currentMenu) return;
+
+  wishlistBtn.addEventListener("click", () => {
+    if (!isLoggedIn()) {
+      showLoginRequiredModal({
+        title: "로그인이 필요해요",
+        message: "찜한 메뉴를 저장하려면 로그인해주세요.",
+        pendingAction: { type: "wishlist", menuId: currentMenu.id },
+      });
+      return;
+    }
+
+    const result = toggleWishlistItem(currentMenu);
+    wishlistBtn.classList.toggle("is-active", result.wishlisted);
+    wishlistBtn.setAttribute("aria-pressed", result.wishlisted ? "true" : "false");
+    wishlistBtn.innerHTML = `
+      <span aria-hidden="true">${result.wishlisted ? "♥" : "♡"}</span>
+      <span>${result.wishlisted ? "찜 해제" : "찜하기"}</span>
+    `;
+    showAppToast(result.wishlisted ? "찜 목록에 저장했어요." : "찜 목록에서 해제됐어요.");
+  });
 }
 
 function bindOptionEvents() {

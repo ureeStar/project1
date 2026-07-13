@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입 - Mellow Yard Coffee</title>
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body class="subpage-with-gnb subpage-with-ambient">
+  <div class="page-ambient" aria-hidden="true">
+    <span class="ambient-wave ambient-wave-a"></span>
+    <span class="ambient-wave ambient-wave-b"></span>
+    <span class="ambient-wave ambient-wave-c"></span>
+    <span class="ambient-shimmer"></span>
+  </div>
+
+  <header class="site-header site-header-subpage">
+    <a class="brand-mark" href="../index.html" aria-label="Mellow Yard Coffee 홈">
+      <span class="brand-symbol" aria-hidden="true">MY</span>
+      <span>
+        <strong>Mellow Yard</strong>
+        <small>Specialty Coffee</small>
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="주요 메뉴">
+      <a class="site-nav-link" href="../index.html">Home</a>
+      <a class="site-nav-link" href="../menus/list.html">Menu</a>
+      <a class="site-nav-link" href="../orders/list.html">Orders</a>
+      <a class="site-nav-link" href="../my/index.html">My</a>
+    </nav>
+
+    <a href="../basket/list.html" class="cart-link" aria-label="장바구니">
+      <span aria-hidden="true">Basket</span>
+      <span class="cart-badge" data-cart-badge hidden>0</span>
+    </a>
+  </header>
+
+  <header class="page-header glass">
+    <a href="../my/index.html" class="icon-btn" aria-label="마이페이지로 이동">←</a>
+    <h1>회원가입</h1>
+    <span class="icon-btn page-header-spacer" aria-hidden="true"></span>
+  </header>
+
+  <main class="auth-page container">
+    <section class="auth-card glass" aria-labelledby="registerTitle">
+      <div class="auth-copy">
+        <p class="auth-eyebrow">Create account</p>
+        <h2 id="registerTitle">이름과 아이디를 정하고 시작하세요.</h2>
+        <p>가입한 계정 정보는 이 브라우저의 localStorage에 저장되는 프론트엔드 테스트용 데이터입니다.</p>
+      </div>
+
+      <form class="auth-form" id="registerForm">
+        <label class="form-field" for="registerName">
+          <span>이름</span>
+          <input id="registerName" class="form-control" name="name" type="text" autocomplete="name" placeholder="예: 멜로우" required />
+          <small>헤더와 마이페이지에 표시됩니다.</small>
+        </label>
+
+        <label class="form-field" for="registerLoginId">
+          <span>아이디</span>
+          <input id="registerLoginId" class="form-control" name="loginId" type="text" autocomplete="username" placeholder="예: mellowyard" required />
+          <small>다른 계정과 중복되지 않는 아이디를 사용합니다.</small>
+        </label>
+
+        <label class="form-field" for="registerPassword">
+          <span>비밀번호</span>
+          <input id="registerPassword" class="form-control" name="password" type="password" autocomplete="new-password" placeholder="비밀번호 입력" required />
+          <small>테스트용이지만 로그인 시 이 값으로 검사합니다.</small>
+        </label>
+
+        <label class="form-field" for="registerPasswordConfirm">
+          <span>비밀번호 확인</span>
+          <input id="registerPasswordConfirm" class="form-control" name="passwordConfirm" type="password" autocomplete="new-password" placeholder="비밀번호 다시 입력" required />
+          <small>비밀번호가 같은지 확인합니다.</small>
+        </label>
+
+        <label class="form-field" for="registerEmail">
+          <span>이메일</span>
+          <input id="registerEmail" class="form-control" name="email" type="email" autocomplete="email" placeholder="coffee@example.com" />
+          <small>선택 입력입니다.</small>
+        </label>
+
+        <label class="form-field" for="favoriteMenu">
+          <span>자주 마시는 메뉴</span>
+          <input id="favoriteMenu" class="form-control" name="favoriteMenu" type="text" placeholder="예: 바닐라 라떼" />
+          <small>선택 입력이며 화면 표시용 참고 정보입니다.</small>
+        </label>
+
+        <p class="auth-error" id="registerError" role="alert" hidden></p>
+
+        <button class="primary-button auth-submit" type="submit">회원가입하기</button>
+      </form>
+    </section>
+  </main>
+
+  <nav class="mobile-nav glass" aria-label="모바일 주요 메뉴">
+    <a href="../index.html">Home</a>
+    <a href="../menus/list.html">Menu</a>
+    <a href="../orders/list.html">Orders</a>
+    <a class="active" href="../my/index.html">My</a>
+  </nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="register.js"></script>
+</body>
+</html>

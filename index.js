@@ -146,6 +146,7 @@ function updateHeaderState() {
 
 // ===== 초기화 =====
 function init() {
+  initializeSharedCustomerUI();
   const featuredEl = document.getElementById("featuredScroll");
   renderFeaturedMenus();
   updateCartBadge();

@@ -48,6 +48,7 @@ function getInitialCategory() {
 }
 
 function init() {
+  initializeSharedCustomerUI();
   selectedCategoryId = getInitialCategory();
   bindControls();
   renderCategoryTabs();
@@ -77,11 +78,11 @@ function bindControls() {
   }
 
   if (menuGrid) {
-    menuGrid.addEventListener("click", handleCartButtonClick);
+    menuGrid.addEventListener("click", handleMenuActionClick);
   }
 
   if (recommendMenuList) {
-    recommendMenuList.addEventListener("click", handleCartButtonClick);
+    recommendMenuList.addEventListener("click", handleMenuActionClick);
   }
 }
 
@@ -164,6 +165,13 @@ function renderRecommendCard(menu) {
         data-menu-id="${escapeHTML(menu.id)}"
         aria-label="${escapeHTML(menu.name)} 장바구니 담기"
       >+</button>
+      <button
+        class="wishlist-button${isWishlisted(menu.id) ? " is-active" : ""}"
+        type="button"
+        data-wishlist-menu-id="${escapeHTML(menu.id)}"
+        aria-label="${escapeHTML(menu.name)} 찜하기"
+        aria-pressed="${isWishlisted(menu.id)}"
+      >${isWishlisted(menu.id) ? "♥" : "♡"}</button>
     </article>
   `;
 }
@@ -199,6 +207,13 @@ function renderMenuCard(menu) {
     <article class="menu-card${soldOut ? " sold-out" : ""}">
       <a class="menu-card-link" href="detail.html?id=${encodeURIComponent(menu.id)}">
         <div class="menu-card-image">
+          <button
+            class="wishlist-button${isWishlisted(menu.id) ? " is-active" : ""}"
+            type="button"
+            data-wishlist-menu-id="${escapeHTML(menu.id)}"
+            aria-label="${escapeHTML(menu.name)} 찜하기"
+            aria-pressed="${isWishlisted(menu.id)}"
+          >${isWishlisted(menu.id) ? "♥" : "♡"}</button>
           <img src="${escapeHTML(getMenuImage(menu))}" alt="${escapeHTML(menu.name)}" loading="lazy" />
           ${soldOut ? `<span class="sold-out-badge">품절</span>` : ""}
         </div>
@@ -220,6 +235,35 @@ function renderMenuCard(menu) {
       </div>
     </article>
   `;
+}
+
+function handleMenuActionClick(event) {
+  if (!(event.target instanceof Element)) return;
+
+  const wishlistButton = event.target.closest("[data-wishlist-menu-id]");
+  if (wishlistButton) {
+    event.preventDefault();
+    const menuId = wishlistButton.dataset.wishlistMenuId;
+    const menu = menuId ? getMenuById(menuId) : null;
+    if (!menu) return;
+
+    if (!isLoggedIn()) {
+      showLoginRequiredModal({
+        title: "로그인이 필요해요",
+        message: "찜한 메뉴를 저장하려면 로그인해주세요.",
+        pendingAction: { type: "wishlist", menuId: menu.id },
+      });
+      return;
+    }
+
+    const result = toggleWishlistItem(menu);
+    renderRecommendations();
+    renderMenuGrid();
+    showCartFeedback(result.wishlisted ? "찜 목록에 저장했어요." : "찜 목록에서 해제됐어요.");
+    return;
+  }
+
+  handleCartButtonClick(event);
 }
 
 function handleCartButtonClick(event) {

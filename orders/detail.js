@@ -64,6 +64,7 @@ function renderProgressSteps(activeStepIndex) {
 }
 
 function init() {
+  initializeSharedCustomerUI();
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("id");
   currentOrder = orderId ? getOrderById(orderId) : null;

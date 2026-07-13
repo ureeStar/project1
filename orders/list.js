@@ -1,4 +1,5 @@
 function init() {
+  initializeSharedCustomerUI();
   renderOrderList();
   updateCartBadge();
 }

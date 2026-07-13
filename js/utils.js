@@ -308,7 +308,7 @@ function getCustomerRegisterUrl() {
 
 function getCustomerMyUrl() {
   const path = window.location.pathname;
-  const subDirectories = ["/menus/", "/basket/", "/orders/", "/wishlist/", "/auth/"];
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
   const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
   return `${prefix}my/index.html`;
 }

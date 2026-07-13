@@ -306,6 +306,13 @@ function getCustomerRegisterUrl() {
   return getCustomerLoginUrl().replace("/login.html", "/register.html");
 }
 
+function getCustomerMyUrl() {
+  const path = window.location.pathname;
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/wishlist/", "/auth/"];
+  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
+  return `${prefix}my/index.html`;
+}
+
 function setPostLoginToast(message) {
   localStorage.setItem(POST_LOGIN_TOAST_KEY, message);
 }
@@ -454,6 +461,7 @@ function renderHeaderAuth() {
   const user = getCurrentUser();
   const loginUrl = getCustomerLoginUrl();
   const registerUrl = getCustomerRegisterUrl();
+  const myUrl = getCustomerMyUrl();
 
   headers.forEach((header) => {
     let authEl = header.querySelector("[data-header-auth]");
@@ -474,7 +482,7 @@ function renderHeaderAuth() {
     if (user) {
       const safeName = String(user.name || "Member").replace(/"/g, "&quot;");
       authEl.innerHTML = `
-        <span class="header-auth-user" title="${safeName}">${safeName}</span>
+        <a class="header-auth-user" href="${myUrl}" title="${safeName}">${safeName}</a>
         <button class="header-auth-link" type="button" data-auth-logout>Logout</button>
       `;
     } else {

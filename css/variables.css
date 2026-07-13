@@ -724,6 +724,18 @@ body.subpage-with-ambient .mobile-nav {
   color: var(--color-text-muted);
   background: rgba(255, 253, 248, 0.72);
   border: 1px solid var(--color-line);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.header-auth-user:hover,
+.header-auth-user:focus-visible {
+  color: var(--color-text-strong);
+  background: var(--color-surface-soft);
+  border-color: var(--color-line-strong);
 }
 
 .header-auth-link {

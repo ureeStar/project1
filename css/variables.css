@@ -418,6 +418,83 @@ body.subpage-with-gnb {
   padding-bottom: calc(var(--mobile-nav-height) + var(--space-lg));
 }
 
+body.subpage-with-ambient {
+  position: relative;
+  overflow-x: hidden;
+}
+
+body.subpage-with-ambient .page-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+body.subpage-with-ambient .ambient-wave,
+body.subpage-with-ambient .ambient-shimmer {
+  position: absolute;
+  inset: auto;
+  display: block;
+}
+
+body.subpage-with-ambient .ambient-wave {
+  border-radius: 42%;
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  filter: blur(14px);
+}
+
+body.subpage-with-ambient .ambient-wave-a {
+  top: -2%;
+  left: -12%;
+  width: 66rem;
+  height: 66rem;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.18) 26%, rgba(255, 255, 255, 0) 60%),
+    conic-gradient(from 180deg, rgba(196, 157, 122, 0.32), rgba(255, 247, 236, 0.14), rgba(222, 188, 153, 0.38), rgba(196, 157, 122, 0.32));
+  animation: ambientFloatA 11s ease-in-out infinite alternate;
+}
+
+body.subpage-with-ambient .ambient-wave-b {
+  top: 24%;
+  right: -10%;
+  width: 60rem;
+  height: 60rem;
+  background:
+    radial-gradient(circle at 58% 42%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.14) 24%, rgba(255, 255, 255, 0) 58%),
+    conic-gradient(from 90deg, rgba(214, 181, 146, 0.28), rgba(255, 249, 241, 0.12), rgba(186, 150, 115, 0.32), rgba(214, 181, 146, 0.28));
+  animation: ambientFloatB 13s ease-in-out infinite alternate;
+}
+
+body.subpage-with-ambient .ambient-wave-c {
+  bottom: -8rem;
+  left: 8%;
+  width: 52rem;
+  height: 52rem;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.12) 28%, rgba(255, 255, 255, 0) 58%),
+    conic-gradient(from 210deg, rgba(232, 206, 182, 0.28), rgba(255, 252, 246, 0.12), rgba(204, 171, 140, 0.3), rgba(232, 206, 182, 0.28));
+  animation: ambientFloatC 12s ease-in-out infinite alternate;
+}
+
+body.subpage-with-ambient .ambient-shimmer {
+  inset: -14% -6%;
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, 0) 8%, rgba(255, 255, 255, 0.64) 24%, rgba(255, 255, 255, 0.14) 38%, rgba(255, 255, 255, 0) 54%),
+    linear-gradient(292deg, rgba(255, 255, 255, 0) 16%, rgba(244, 230, 213, 0.46) 36%, rgba(255, 255, 255, 0.08) 52%, rgba(255, 255, 255, 0) 68%);
+  opacity: 0.78;
+  transform: translate3d(0, 0, 0) scale(1.16);
+  animation: ambientShimmer 8s linear infinite;
+}
+
+body.subpage-with-ambient main,
+body.subpage-with-ambient .site-footer,
+body.subpage-with-ambient .mobile-nav {
+  position: relative;
+  z-index: 1;
+}
+
 .site-header {
   min-height: var(--header-height);
   display: flex;
@@ -603,6 +680,11 @@ body.subpage-with-gnb {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+
+  body.subpage-with-ambient .ambient-wave,
+  body.subpage-with-ambient .ambient-shimmer {
+    animation: none;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -612,6 +694,31 @@ body.subpage-with-gnb {
 }
 
 @media (max-width: 767px) {
+  body.subpage-with-ambient .ambient-wave-a {
+    top: -4rem;
+    left: -18rem;
+    width: 34rem;
+    height: 34rem;
+  }
+
+  body.subpage-with-ambient .ambient-wave-b {
+    top: 32%;
+    right: -16rem;
+    width: 30rem;
+    height: 30rem;
+  }
+
+  body.subpage-with-ambient .ambient-wave-c {
+    bottom: -12rem;
+    left: -4rem;
+    width: 24rem;
+    height: 24rem;
+  }
+
+  body.subpage-with-ambient .ambient-shimmer {
+    opacity: 0.5;
+  }
+
   .brand-symbol {
     width: 38px;
     height: 38px;
@@ -633,5 +740,44 @@ body.subpage-with-gnb {
   .cart-link span[aria-hidden="true"]::before {
     content: "Bag";
     font-size: var(--font-size-sm);
+  }
+}
+
+@keyframes ambientFloatA {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translate3d(16%, 10%, 0) rotate(24deg) scale(1.16);
+  }
+}
+
+@keyframes ambientFloatB {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translate3d(-16%, -8%, 0) rotate(-22deg) scale(1.18);
+  }
+}
+
+@keyframes ambientFloatC {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translate3d(12%, -15%, 0) rotate(20deg) scale(1.14);
+  }
+}
+
+@keyframes ambientShimmer {
+  0% {
+    transform: translate3d(-12%, 0, 0) scale(1.16);
+  }
+  50% {
+    transform: translate3d(12%, -4%, 0) scale(1.24);
+  }
+  100% {
+    transform: translate3d(-12%, 0, 0) scale(1.16);
   }
 }

@@ -33,6 +33,22 @@ function init() {
   renderBasketPage();
 }
 
+function updateCartBadge() {
+  const badgeEls = document.querySelectorAll("[data-cart-badge]");
+  if (!badgeEls.length) return;
+
+  const count = getCartTotalCount();
+
+  badgeEls.forEach((badgeEl) => {
+    if (count > 0) {
+      badgeEl.textContent = count > 99 ? "99+" : String(count);
+      badgeEl.hidden = false;
+    } else {
+      badgeEl.hidden = true;
+    }
+  });
+}
+
 function getCheckoutNoticeElement() {
   let noticeEl = document.getElementById("checkoutNotice");
 
@@ -117,6 +133,7 @@ function renderBasketPage() {
 
   document.getElementById("summaryCount").textContent = `${totalCount}개`;
   document.getElementById("summaryPrice").textContent = formatPrice(totalPrice);
+  updateCartBadge();
 
   if (cartItems.length === 0) {
     contentEl.innerHTML = renderEmptyState();

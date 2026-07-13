@@ -7,7 +7,29 @@
   <link rel="stylesheet" href="../css/variables.css" />
   <link rel="stylesheet" href="detail.css" />
 </head>
-<body>
+<body class="subpage-with-gnb">
+  <header class="site-header site-header-subpage">
+    <a class="brand-mark" href="../index.html" aria-label="Mellow Yard Coffee 홈">
+      <span class="brand-symbol" aria-hidden="true">MY</span>
+      <span>
+        <strong>Mellow Yard</strong>
+        <small>Specialty Coffee</small>
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="주요 메뉴">
+      <a class="site-nav-link" href="../index.html">Home</a>
+      <a class="site-nav-link active" href="./list.html" aria-current="page">Menu</a>
+      <a class="site-nav-link" href="../orders/list.html">Orders</a>
+      <a class="site-nav-link" href="../my/index.html">My</a>
+    </nav>
+
+    <a href="../basket/list.html" class="cart-link" aria-label="장바구니">
+      <span aria-hidden="true">Basket</span>
+      <span class="cart-badge" data-cart-badge hidden>0</span>
+    </a>
+  </header>
+
   <header class="page-header">
     <a href="list.html" class="icon-btn" aria-label="목록으로">‹</a>
     <a class="header-brand" href="../index.html">
@@ -16,11 +38,18 @@
     </a>
     <a href="../basket/list.html" class="icon-btn cart-btn" aria-label="장바구니">
       Bag
-      <span class="cart-badge" id="cartBadge" hidden>0</span>
+      <span class="cart-badge" data-cart-badge hidden>0</span>
     </a>
   </header>
 
   <main class="menu-detail-page container" id="menuDetail"></main>
+
+  <nav class="mobile-nav glass" aria-label="모바일 주요 메뉴">
+    <a href="../index.html">Home</a>
+    <a class="active" href="./list.html" aria-current="page">Menu</a>
+    <a href="../orders/list.html">Orders</a>
+    <a href="../my/index.html">My</a>
+  </nav>
 
   <script src="../js/data.js"></script>
   <script src="../js/utils.js"></script>

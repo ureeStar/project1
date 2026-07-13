@@ -252,17 +252,19 @@ function showCartFeedback(message) {
 }
 
 function updateCartBadge() {
-  const badgeEl = document.getElementById("cartBadge");
-  if (!badgeEl) return;
+  const badgeEls = document.querySelectorAll("[data-cart-badge]");
+  if (!badgeEls.length) return;
 
   const count = getCartTotalCount();
 
-  if (count > 0) {
-    badgeEl.textContent = count > 99 ? "99+" : String(count);
-    badgeEl.hidden = false;
-  } else {
-    badgeEl.hidden = true;
-  }
+  badgeEls.forEach((badgeEl) => {
+    if (count > 0) {
+      badgeEl.textContent = count > 99 ? "99+" : String(count);
+      badgeEl.hidden = false;
+    } else {
+      badgeEl.hidden = true;
+    }
+  });
 }
 
 init();

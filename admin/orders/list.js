@@ -1,18 +1,23 @@
+const ITEMS_PER_PAGE = 5;
+
 const statusFilter = document.getElementById("statusFilter");
 const keywordInput = document.getElementById("keywordInput");
 const orderList = document.getElementById("orderList");
+const orderPagination = document.getElementById("orderPagination");
 const totalCount = document.getElementById("totalCount");
 const receivedCount = document.getElementById("receivedCount");
 const preparingCount = document.getElementById("preparingCount");
 const doneCount = document.getElementById("doneCount");
 const resultText = document.getElementById("resultText");
 
+let currentPage = 1;
+
 function getStatusMeta(status) {
   if (status === "완료") {
     return {
       className: "status-done",
       label: "완료",
-      description: "고객 수령까지 끝난 주문입니다.",
+      description: "고객 수령까지 마무리된 주문입니다.",
     };
   }
 
@@ -59,9 +64,73 @@ function getNextStatus(status) {
   return ORDER_STATUSES[index + 1];
 }
 
+function getPageCount(totalItems) {
+  return Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+}
+
+function getVisibleOrders(orders) {
+  const pageCount = getPageCount(orders.length);
+  currentPage = Math.min(Math.max(currentPage, 1), pageCount);
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  return orders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+}
+
+function renderPagination(totalItems) {
+  const pageCount = getPageCount(totalItems);
+
+  if (totalItems === 0 || pageCount === 1) {
+    orderPagination.innerHTML = "";
+    orderPagination.hidden = true;
+    return;
+  }
+
+  orderPagination.hidden = false;
+
+  const pageButtons = Array.from({ length: pageCount }, (_, index) => {
+    const page = index + 1;
+    const isCurrent = page === currentPage;
+
+    return `
+      <button
+        class="pagination-button${isCurrent ? " is-active" : ""}"
+        type="button"
+        data-page="${page}"
+        ${isCurrent ? 'aria-current="page"' : ""}
+      >
+        ${page}
+      </button>
+    `;
+  }).join("");
+
+  orderPagination.innerHTML = `
+    <button
+      class="pagination-button pagination-button-nav"
+      type="button"
+      data-page="${currentPage - 1}"
+      ${currentPage === 1 ? "disabled" : ""}
+      aria-label="이전 페이지"
+    >
+      Prev
+    </button>
+    <div class="pagination-pages">${pageButtons}</div>
+    <button
+      class="pagination-button pagination-button-nav"
+      type="button"
+      data-page="${currentPage + 1}"
+      ${currentPage === pageCount ? "disabled" : ""}
+      aria-label="다음 페이지"
+    >
+      Next
+    </button>
+  `;
+}
+
 function renderList() {
   const orders = getFilteredOrders();
-  resultText.textContent = `총 ${orders.length}건`;
+  const pageCount = getPageCount(orders.length);
+  currentPage = Math.min(Math.max(currentPage, 1), pageCount);
+  resultText.textContent = orders.length ? `총 ${orders.length}건 · ${currentPage} / ${pageCount} 페이지` : "총 0건";
 
   if (!orders.length) {
     orderList.innerHTML = `
@@ -69,13 +138,17 @@ function renderList() {
         조건에 맞는 주문이 없습니다. 검색어를 바꾸거나 상태 필터를 다시 선택해 보세요.
       </div>
     `;
+    renderPagination(0);
     return;
   }
 
-  orderList.innerHTML = orders
+  const visibleOrders = getVisibleOrders(orders);
+
+  orderList.innerHTML = visibleOrders
     .map((order) => {
       const nextStatus = getNextStatus(order.status);
       const statusMeta = getStatusMeta(order.status);
+
       return `
         <article class="order-card">
           <div class="order-card-top">
@@ -115,6 +188,8 @@ function renderList() {
       `;
     })
     .join("");
+
+  renderPagination(orders.length);
 }
 
 function handleListClick(event) {
@@ -137,13 +212,29 @@ function handleListClick(event) {
   }
 }
 
+function handlePaginationClick(event) {
+  const button = event.target.closest("[data-page]");
+  if (!button || button.disabled) {
+    return;
+  }
+
+  currentPage = Number(button.dataset.page);
+  renderList();
+}
+
+function handleFilterChange() {
+  currentPage = 1;
+  renderList();
+}
+
 function initializePage() {
   renderSummary();
   renderList();
 
-  statusFilter.addEventListener("change", renderList);
-  keywordInput.addEventListener("input", renderList);
+  statusFilter.addEventListener("change", handleFilterChange);
+  keywordInput.addEventListener("input", handleFilterChange);
   orderList.addEventListener("click", handleListClick);
+  orderPagination.addEventListener("click", handlePaginationClick);
 }
 
 initializePage();

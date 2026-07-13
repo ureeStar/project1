@@ -297,7 +297,7 @@ function consumeRedirectAfterLogin(fallbackUrl = "../index.html") {
 
 function getCustomerLoginUrl() {
   const path = window.location.pathname;
-  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/"];
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
   const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
   return `${prefix}auth/login.html`;
 }

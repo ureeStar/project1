@@ -1,7 +1,14 @@
+const ITEMS_PER_PAGE = 5;
+
+let currentPage = 1;
+
 function init() {
   initializeSharedCustomerUI();
   renderOrderList();
   updateCartBadge();
+
+  const paginationEl = document.getElementById("orderPagination");
+  paginationEl.addEventListener("click", handlePaginationClick);
 }
 
 function getDisplayStatusMeta(status) {
@@ -32,18 +39,88 @@ function getDisplayStatusMeta(status) {
   );
 }
 
-function renderOrderList() {
-  const listEl = document.getElementById("orderList");
-  const orders = getOrders()
+function getSortedOrders() {
+  return getOrders()
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
 
-  if (orders.length === 0) {
-    listEl.innerHTML = '<p class="empty-state">주문 내역이 없습니다.</p>';
+function getPageCount(totalItems) {
+  return Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+}
+
+function getVisibleOrders(orders) {
+  const pageCount = getPageCount(orders.length);
+  currentPage = Math.min(Math.max(currentPage, 1), pageCount);
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  return orders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+}
+
+function renderPagination(totalItems) {
+  const paginationEl = document.getElementById("orderPagination");
+  const pageCount = getPageCount(totalItems);
+
+  if (totalItems === 0 || pageCount === 1) {
+    paginationEl.innerHTML = "";
+    paginationEl.hidden = true;
     return;
   }
 
-  listEl.innerHTML = orders
+  paginationEl.hidden = false;
+
+  const pageButtons = Array.from({ length: pageCount }, (_, index) => {
+    const page = index + 1;
+    const isCurrent = page === currentPage;
+
+    return `
+      <button
+        class="pagination-button${isCurrent ? " is-active" : ""}"
+        type="button"
+        data-page="${page}"
+        ${isCurrent ? 'aria-current="page"' : ""}
+      >
+        ${page}
+      </button>
+    `;
+  }).join("");
+
+  paginationEl.innerHTML = `
+    <button
+      class="pagination-button pagination-button-nav"
+      type="button"
+      data-page="${currentPage - 1}"
+      ${currentPage === 1 ? "disabled" : ""}
+      aria-label="이전 페이지"
+    >
+      Prev
+    </button>
+    <div class="pagination-pages">${pageButtons}</div>
+    <button
+      class="pagination-button pagination-button-nav"
+      type="button"
+      data-page="${currentPage + 1}"
+      ${currentPage === pageCount ? "disabled" : ""}
+      aria-label="다음 페이지"
+    >
+      Next
+    </button>
+  `;
+}
+
+function renderOrderList() {
+  const listEl = document.getElementById("orderList");
+  const orders = getSortedOrders();
+
+  if (orders.length === 0) {
+    listEl.innerHTML = '<p class="empty-state">주문 내역이 없습니다.</p>';
+    renderPagination(0);
+    return;
+  }
+
+  const visibleOrders = getVisibleOrders(orders);
+
+  listEl.innerHTML = visibleOrders
     .map((order) => {
       const statusMeta = getDisplayStatusMeta(order.status);
 
@@ -69,6 +146,18 @@ function renderOrderList() {
       `;
     })
     .join("");
+
+  renderPagination(orders.length);
+}
+
+function handlePaginationClick(event) {
+  const button = event.target.closest("[data-page]");
+  if (!button || button.disabled) {
+    return;
+  }
+
+  currentPage = Number(button.dataset.page);
+  renderOrderList();
 }
 
 function updateCartBadge() {

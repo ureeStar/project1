@@ -225,13 +225,48 @@ function authenticateLocalUser(loginId, password) {
   };
 }
 
+function getWishlistScopeKey() {
+  const currentUser = getCurrentUser();
+  return currentUser?.id || "guest";
+}
+
+function normalizeWishlistItems(items) {
+  return Array.isArray(items) ? items : [];
+}
+
+function getWishlistStore() {
+  const parsed = safeParseJSON(localStorage.getItem(WISHLIST_STORAGE_KEY), {});
+
+  if (Array.isArray(parsed)) {
+    return {
+      guest: normalizeWishlistItems(parsed),
+    };
+  }
+
+  if (!parsed || typeof parsed !== "object") {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(parsed).map(([scopeKey, items]) => [scopeKey, normalizeWishlistItems(items)])
+  );
+}
+
+function saveWishlistStore(store) {
+  localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(store));
+  return store;
+}
+
 function getWishlist() {
-  const wishlist = safeParseJSON(localStorage.getItem(WISHLIST_STORAGE_KEY), []);
-  return Array.isArray(wishlist) ? wishlist : [];
+  const store = getWishlistStore();
+  return normalizeWishlistItems(store[getWishlistScopeKey()]);
 }
 
 function saveWishlist(items) {
-  localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
+  const store = getWishlistStore();
+  const scopeKey = getWishlistScopeKey();
+  store[scopeKey] = normalizeWishlistItems(items);
+  saveWishlistStore(store);
   return items;
 }
 

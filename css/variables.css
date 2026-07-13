@@ -568,6 +568,11 @@ body.subpage-with-gnb {
   background: var(--color-primary);
 }
 
+.page-header-spacer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 @media (min-width: 768px) {
   :root {
     --page-gutter: var(--page-gutter-tablet);

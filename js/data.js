@@ -264,7 +264,14 @@ function getOrders() {
   const raw = localStorage.getItem(ORDERS_STORAGE_KEY);
   if (!raw) return [];
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.map((order) => ({
+      ...order,
+      userId: order.userId || null,
+    }));
   } catch {
     return [];
   }
@@ -277,6 +284,14 @@ function saveOrders(orders) {
 
 function getOrderById(orderId) {
   return getOrders().find((order) => order.id === orderId) || null;
+}
+
+function getOrdersByUserId(userId) {
+  if (!userId) {
+    return [];
+  }
+
+  return getOrders().filter((order) => order.userId === userId);
 }
 
 function getOrderTotalPrice(order) {

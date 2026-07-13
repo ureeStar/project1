@@ -215,10 +215,12 @@ function createOrderFromCart() {
   }
 
   const now = new Date();
+  const currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
   const nextOrder = {
     id: generateOrderId(now),
     createdAt: now.toISOString(),
     status: ORDER_STATUSES[0],
+    userId: currentUser ? currentUser.id : null,
     items: cartItems.map((item) => ({
       menuId: item.menuId,
       quantity: item.quantity,

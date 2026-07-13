@@ -306,6 +306,13 @@ function getCustomerRegisterUrl() {
   return getCustomerLoginUrl().replace("/login.html", "/register.html");
 }
 
+function getCustomerHomeUrl() {
+  const path = window.location.pathname;
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
+  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
+  return `${prefix}index.html`;
+}
+
 function getCustomerMyUrl() {
   const path = window.location.pathname;
   const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
@@ -498,7 +505,9 @@ function renderHeaderAuth() {
       logoutCurrentUser();
       clearPendingAction();
       localStorage.removeItem(REDIRECT_AFTER_LOGIN_KEY);
-      renderHeaderAuth();
+      window.setTimeout(() => {
+        window.location.href = getCustomerHomeUrl();
+      }, 180);
       showAppToast("로그아웃되었습니다.");
     };
   });

@@ -4,6 +4,11 @@ const INFO_MESSAGES = {
   terms: "이용약관 및 정책 페이지를 준비 중입니다.",
 };
 
+function getUserScopedOrders() {
+  const user = getCurrentUser();
+  return user ? getOrdersByUserId(user.id) : [];
+}
+
 function getDisplayStatusMeta(status) {
   const map = {
     주문접수: {
@@ -48,7 +53,7 @@ function getOrderTotal(order) {
 function renderCartSummary() {
   const totalCount = getCartTotalCount();
   const totalPrice = getCartTotalPrice(getMenuById);
-  const orders = getOrders();
+  const orders = getUserScopedOrders();
   const stampCount = Math.min(orders.length * 2, 12);
   const remainCount = Math.max(12 - stampCount, 0);
 
@@ -61,7 +66,7 @@ function renderCartSummary() {
 
 function renderRecentOrder() {
   const recentOrderEl = document.getElementById("recentOrderCard");
-  const orders = getOrders()
+  const orders = getUserScopedOrders()
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -94,7 +99,7 @@ function renderRecentOrder() {
 
 function renderStamps() {
   const stampGridEl = document.getElementById("stampGrid");
-  const stampCount = Math.min(getOrders().length * 2, 12);
+  const stampCount = Math.min(getUserScopedOrders().length * 2, 12);
 
   stampGridEl.innerHTML = Array.from({ length: 12 }, (_, index) => {
     const isActive = index < stampCount;
@@ -156,8 +161,12 @@ function handleInfoClick(event) {
 function handleAuthAction() {
   if (isLoggedIn()) {
     logoutCurrentUser();
+    clearPendingAction();
+    localStorage.removeItem(REDIRECT_AFTER_LOGIN_KEY);
     showAppToast("로그아웃되었습니다.");
-    renderProfile();
+    window.setTimeout(() => {
+      window.location.href = "../index.html";
+    }, 180);
     return;
   }
 

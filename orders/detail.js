@@ -67,10 +67,23 @@ function init() {
   initializeSharedCustomerUI();
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("id");
-  currentOrder = orderId ? getOrderById(orderId) : null;
+  currentOrder = getAccessibleOrder(orderId);
 
   renderOrderDetail();
   updateCartBadge();
+}
+
+function getAccessibleOrder(orderId) {
+  if (!orderId) {
+    return null;
+  }
+
+  const user = getCurrentUser();
+  if (!user) {
+    return null;
+  }
+
+  return getOrdersByUserId(user.id).find((order) => order.id === orderId) || null;
 }
 
 function renderOrderDetail() {

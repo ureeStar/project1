@@ -40,7 +40,10 @@ function getDisplayStatusMeta(status) {
 }
 
 function getSortedOrders() {
-  return getOrders()
+  const user = getCurrentUser();
+  const orders = user ? getOrdersByUserId(user.id) : [];
+
+  return orders
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }

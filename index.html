@@ -60,6 +60,71 @@
       </div>
     </section>
 
+    <section class="recommendation-section container-main" aria-labelledby="recommendationTitle">
+      <div class="recommendation-shell glass">
+        <div class="section-heading recommendation-heading">
+          <div>
+            <p class="section-kicker">Personal pairing</p>
+            <h2 id="recommendationTitle">오늘의 취향 추천</h2>
+          </div>
+          <button class="secondary-button recommendation-submit" id="recommendationSubmit" type="button">추천 보기</button>
+        </div>
+
+        <form class="recommendation-form" id="recommendationForm">
+          <fieldset class="recommendation-group">
+            <legend>기분</legend>
+            <div class="recommendation-options" data-preference-group="mood" data-selection-mode="single">
+              <button type="button" class="preference-chip" data-preference-key="mood" data-preference-value="calm">차분해요</button>
+              <button type="button" class="preference-chip" data-preference-key="mood" data-preference-value="focused">집중하고 싶어요</button>
+              <button type="button" class="preference-chip" data-preference-key="mood" data-preference-value="tired">조금 피곤해요</button>
+              <button type="button" class="preference-chip" data-preference-key="mood" data-preference-value="cheerful">기분 전환이 필요해요</button>
+              <button type="button" class="preference-chip" data-preference-key="mood" data-preference-value="comfort">편안한 게 좋아요</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="recommendation-group">
+            <legend>날씨</legend>
+            <div class="recommendation-options" data-preference-group="weather" data-selection-mode="single">
+              <button type="button" class="preference-chip" data-preference-key="weather" data-preference-value="sunny">맑아요</button>
+              <button type="button" class="preference-chip" data-preference-key="weather" data-preference-value="hot">더워요</button>
+              <button type="button" class="preference-chip" data-preference-key="weather" data-preference-value="rainy">비 와요</button>
+              <button type="button" class="preference-chip" data-preference-key="weather" data-preference-value="cold">쌀쌀해요</button>
+              <button type="button" class="preference-chip" data-preference-key="weather" data-preference-value="cloudy">흐려요</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="recommendation-group">
+            <legend>취향</legend>
+            <div class="recommendation-options" data-preference-group="tastes" data-selection-mode="multiple">
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="sweet">달콤한 맛</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="creamy">부드러운 맛</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="bold">진한 맛</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="clean">깔끔한 맛</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="refreshing">상큼한 맛</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="citrus">시트러스</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="nutty">고소한 맛</button>
+              <button type="button" class="preference-chip" data-preference-key="tastes" data-preference-value="rich">묵직한 맛</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="recommendation-group recommendation-group-inline">
+            <legend>추가 선택</legend>
+            <div class="recommendation-options" data-preference-group="temperature" data-selection-mode="single">
+              <button type="button" class="preference-chip" data-preference-key="temperature" data-preference-value="hot">따뜻한 음료</button>
+              <button type="button" class="preference-chip" data-preference-key="temperature" data-preference-value="cold">차가운 음료</button>
+            </div>
+            <label class="preference-toggle">
+              <input type="checkbox" id="decafPreference" />
+              <span>디카페인 우선</span>
+            </label>
+          </fieldset>
+        </form>
+
+        <p class="recommendation-feedback" id="recommendationFeedback" role="status" aria-live="polite"></p>
+        <div class="recommendation-results" id="recommendationResults" aria-live="polite"></div>
+      </div>
+    </section>
+
     <section class="featured-section container-main" id="featured" aria-labelledby="featuredTitle">
       <div class="section-heading">
         <p class="section-kicker">Today&apos;s cups</p>

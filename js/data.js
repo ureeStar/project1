@@ -100,6 +100,150 @@ const MENUS = [
   },
 ];
 
+const MENU_RECOMMENDATION_META = {
+  americano: {
+    isActive: true,
+    recommendation: {
+      moods: ["focused", "tired", "classic"],
+      weathers: ["rainy", "cold", "cloudy"],
+      tastes: ["bold", "clean", "bitter"],
+      serving: "hot",
+      caffeine: "high",
+      decaf: true,
+      popularity: 0.82,
+    },
+  },
+  latte: {
+    isActive: true,
+    recommendation: {
+      moods: ["calm", "comfort", "tired"],
+      weathers: ["rainy", "cold", "cloudy"],
+      tastes: ["creamy", "sweet", "soft"],
+      serving: "hot",
+      caffeine: "medium",
+      decaf: true,
+      popularity: 0.91,
+    },
+  },
+  cappuccino: {
+    isActive: true,
+    recommendation: {
+      moods: ["focused", "calm", "classic"],
+      weathers: ["cold", "cloudy"],
+      tastes: ["nutty", "rich", "bold"],
+      serving: "hot",
+      caffeine: "medium",
+      decaf: false,
+      popularity: 0.76,
+    },
+  },
+  "vanilla-latte": {
+    isActive: true,
+    recommendation: {
+      moods: ["cheerful", "comfort", "calm"],
+      weathers: ["cold", "rainy", "cloudy"],
+      tastes: ["sweet", "creamy", "soft"],
+      serving: "hot",
+      caffeine: "medium",
+      decaf: true,
+      popularity: 0.95,
+    },
+  },
+  "earl-grey": {
+    isActive: true,
+    recommendation: {
+      moods: ["calm", "classic", "focused"],
+      weathers: ["rainy", "cloudy"],
+      tastes: ["floral", "clean", "soft"],
+      serving: "hot",
+      caffeine: "low",
+      decaf: false,
+      popularity: 0.58,
+    },
+  },
+  peppermint: {
+    isActive: true,
+    recommendation: {
+      moods: ["calm", "refresh", "comfort"],
+      weathers: ["hot", "cloudy", "rainy"],
+      tastes: ["refreshing", "herbal", "clean"],
+      serving: "cold",
+      caffeine: "none",
+      decaf: true,
+      popularity: 0.49,
+    },
+  },
+  "lemon-ade": {
+    isActive: true,
+    recommendation: {
+      moods: ["refresh", "cheerful", "tired"],
+      weathers: ["hot", "sunny"],
+      tastes: ["citrus", "refreshing", "clean"],
+      serving: "cold",
+      caffeine: "none",
+      decaf: true,
+      popularity: 0.73,
+    },
+  },
+  "grapefruit-ade": {
+    isActive: true,
+    recommendation: {
+      moods: ["refresh", "cheerful", "bold"],
+      weathers: ["hot", "sunny"],
+      tastes: ["citrus", "tart", "refreshing"],
+      serving: "cold",
+      caffeine: "none",
+      decaf: true,
+      popularity: 0.78,
+    },
+  },
+  cheesecake: {
+    isActive: true,
+    recommendation: {
+      moods: ["comfort", "cheerful", "calm"],
+      weathers: ["rainy", "cloudy", "cold"],
+      tastes: ["sweet", "rich", "creamy"],
+      serving: "cold",
+      caffeine: "none",
+      decaf: true,
+      popularity: 0.65,
+    },
+  },
+  croissant: {
+    isActive: true,
+    recommendation: {
+      moods: ["classic", "comfort", "focused"],
+      weathers: ["sunny", "cloudy", "cold"],
+      tastes: ["buttery", "light", "savory"],
+      serving: "warm",
+      caffeine: "none",
+      decaf: true,
+      popularity: 0.61,
+    },
+  },
+};
+
+function createRecommendationMeta(meta = {}) {
+  return {
+    moods: Array.isArray(meta.moods) ? meta.moods : [],
+    weathers: Array.isArray(meta.weathers) ? meta.weathers : [],
+    tastes: Array.isArray(meta.tastes) ? meta.tastes : [],
+    serving: meta.serving || null,
+    caffeine: meta.caffeine || "medium",
+    decaf: Boolean(meta.decaf),
+    popularity: Number(meta.popularity) || 0,
+  };
+}
+
+function normalizeMenu(menu) {
+  const metaConfig = MENU_RECOMMENDATION_META[menu.id] || {};
+  return {
+    ...menu,
+    isActive: menu.isActive !== undefined ? Boolean(menu.isActive) : metaConfig.isActive !== false,
+    recommendation: createRecommendationMeta(menu.recommendation || metaConfig.recommendation),
+  };
+}
+
 const MENU_STORAGE_KEY = "cafe-app:menus";
 
 function getCategories() {
@@ -107,7 +251,7 @@ function getCategories() {
 }
 
 function getSeedMenus() {
-  return MENUS.map((menu) => ({ ...menu }));
+  return MENUS.map((menu) => normalizeMenu({ ...menu }));
 }
 
 function getAllMenus() {
@@ -124,7 +268,7 @@ function getAllMenus() {
     if (!Array.isArray(parsed)) {
       throw new Error("Invalid menu data");
     }
-    return parsed;
+    return parsed.map((menu) => normalizeMenu(menu));
   } catch {
     const seedMenus = getSeedMenus();
     localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(seedMenus));
@@ -168,11 +312,13 @@ function createMenu(menuInput) {
     description: menuInput.description || "",
     image: menuInput.image || "",
     soldOut: Boolean(menuInput.soldOut),
+    isActive: menuInput.isActive !== false,
+    recommendation: createRecommendationMeta(menuInput.recommendation),
   };
 
-  menus.push(nextMenu);
+  menus.push(normalizeMenu(nextMenu));
   saveMenus(menus);
-  return nextMenu;
+  return menus[menus.length - 1];
 }
 
 function updateMenu(menuId, menuInput) {
@@ -183,12 +329,12 @@ function updateMenu(menuId, menuInput) {
     return null;
   }
 
-  menus[index] = {
+  menus[index] = normalizeMenu({
     ...menus[index],
     ...menuInput,
     price: Number(menuInput.price ?? menus[index].price),
     soldOut: Boolean(menuInput.soldOut),
-  };
+  });
 
   saveMenus(menus);
   return menus[index];

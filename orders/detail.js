@@ -5,19 +5,19 @@ function getDisplayStatusMeta(status) {
     주문접수: {
       label: "접수",
       className: "status-received",
-      message: "주문이 접수되어 바에서 확인 중입니다.",
+      message: "주문이 접수되어 매장에서 확인하고 있어요.",
       stepIndex: 0,
     },
     준비중: {
       label: "제조중",
       className: "status-making",
-      message: "바리스타가 음료를 준비하고 있습니다.",
+      message: "바리스타가 음료를 준비하고 있어요.",
       stepIndex: 1,
     },
     완료: {
       label: "픽업완료",
       className: "status-picked",
-      message: "주문 수령이 완료되었습니다.",
+      message: "주문 수령이 완료되었어요.",
       stepIndex: 3,
     },
   };
@@ -26,7 +26,7 @@ function getDisplayStatusMeta(status) {
     map[status] || {
       label: status,
       className: "status-received",
-      message: "주문 상태를 확인해 주세요.",
+      message: "주문 상태를 확인해주세요.",
       stepIndex: 0,
     }
   );
@@ -63,16 +63,6 @@ function renderProgressSteps(activeStepIndex) {
     .join("");
 }
 
-function init() {
-  initializeSharedCustomerUI();
-  const params = new URLSearchParams(window.location.search);
-  const orderId = params.get("id");
-  currentOrder = getAccessibleOrder(orderId);
-
-  renderOrderDetail();
-  updateCartBadge();
-}
-
 function getAccessibleOrder(orderId) {
   if (!orderId) {
     return null;
@@ -86,11 +76,38 @@ function getAccessibleOrder(orderId) {
   return getOrdersByUserId(user.id).find((order) => order.id === orderId) || null;
 }
 
+function init() {
+  initializeSharedCustomerUI();
+  const params = new URLSearchParams(window.location.search);
+  currentOrder = getAccessibleOrder(params.get("id"));
+
+  renderOrderDetail();
+  updateCartBadge();
+}
+
 function renderOrderDetail() {
   const detailEl = document.getElementById("orderDetail");
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get("id");
+  const user = getCurrentUser();
 
-  if (!currentOrder) {
-    detailEl.innerHTML = '<p class="not-found">주문을 찾을 수 없습니다.</p>';
+  if (!user) {
+    detailEl.innerHTML = `
+      <section class="not-found">
+        <p>주문 상세를 보려면 먼저 로그인해주세요.</p>
+        <a class="secondary-button" href="../auth/login.html">로그인하기</a>
+      </section>
+    `;
+    return;
+  }
+
+  if (!orderId || !currentOrder) {
+    detailEl.innerHTML = `
+      <section class="not-found">
+        <p>주문 정보를 찾을 수 없습니다.</p>
+        <a class="secondary-button" href="./list.html">주문 목록으로</a>
+      </section>
+    `;
     return;
   }
 

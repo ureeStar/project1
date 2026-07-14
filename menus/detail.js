@@ -13,8 +13,8 @@ const MENU_IMAGE_FALLBACKS = {
 
 const CATEGORY_LABELS = {
   coffee: "Coffee",
-  tea: "Non-Coffee",
-  ade: "Non-Coffee",
+  tea: "Tea",
+  ade: "Ade",
   dessert: "Dessert",
 };
 
@@ -36,7 +36,7 @@ function getMenuImage(menu) {
 
 function getCategoryLabel(categoryId) {
   const category = getCategoryById(categoryId);
-  return CATEGORY_LABELS[categoryId] || (category ? category.name : "Seasonal");
+  return CATEGORY_LABELS[categoryId] || (category ? category.name : "Menu");
 }
 
 function isDessertMenu(menu) {
@@ -65,7 +65,7 @@ function renderOptionButton(label, value, isSelected, isLocked = false) {
       data-option-value="${escapeHTML(value)}"
       ${isSelected ? 'class="selected"' : ""}
       ${isLocked ? "disabled" : ""}
-      ${isSelected ? 'aria-pressed="true"' : 'aria-pressed="false"'}
+      aria-pressed="${isSelected ? "true" : "false"}"
     >${escapeHTML(label)}</button>
   `;
 }
@@ -82,7 +82,7 @@ function renderTemperatureControl(menu) {
       <div class="option-group">
         <div class="option-heading">
           <span class="option-title">온도</span>
-          <span class="option-hint">에이드는 아이스만 제공됩니다</span>
+          <span class="option-hint">에이드는 ICE로만 제공됩니다.</span>
         </div>
         <div class="segmented-control is-single" aria-label="온도 옵션" data-option-group="temperature">
           ${renderOptionButton("ICE", defaultOptions.temperature, true, true)}
@@ -178,11 +178,11 @@ function renderMenuDetail() {
         <dl class="menu-meta">
           <div>
             <dt>구성</dt>
-            <dd>주문 즉시 정성스럽게 준비해 드립니다</dd>
+            <dd>주문 즉시 정성스럽게 준비해 드립니다.</dd>
           </div>
           <div>
             <dt>안내</dt>
-            <dd>알레르기 정보와 재고 상황은 매장 기준으로 운영됩니다</dd>
+            <dd>알레르기 정보와 제공 방식은 매장 기준으로 운영됩니다.</dd>
           </div>
         </dl>
 
@@ -217,7 +217,7 @@ function renderWishlistButton(menu) {
       type="button"
       id="detailWishlistBtn"
       aria-label="${escapeHTML(menu.name)} 찜하기"
-      aria-pressed="${wishlisted}"
+      aria-pressed="${wishlisted ? "true" : "false"}"
     >
       <span aria-hidden="true">${wishlisted ? "♥" : "♡"}</span>
       <span>${wishlisted ? "찜 해제" : "찜하기"}</span>
@@ -229,7 +229,7 @@ function renderSoldOutNotice() {
   return `
     <div class="soldout-panel">
       <strong>지금은 준비가 끝난 메뉴입니다.</strong>
-      <p>다른 추천 메뉴를 둘러보거나, 다음 방문 때 다시 확인해 주세요.</p>
+      <p>다른 추천 메뉴를 둘러보거나 다음 방문 때 다시 확인해주세요.</p>
     </div>
   `;
 }
@@ -310,7 +310,7 @@ function bindWishlistEvent() {
       <span aria-hidden="true">${result.wishlisted ? "♥" : "♡"}</span>
       <span>${result.wishlisted ? "찜 해제" : "찜하기"}</span>
     `;
-    showAppToast(result.wishlisted ? "찜 목록에 저장했어요." : "찜 목록에서 해제됐어요.");
+    showAppToast(result.wishlisted ? "찜 목록에 저장했어요." : "찜 목록에서 제거했어요.");
   });
 }
 
@@ -370,7 +370,7 @@ function bindAddToCartEvent() {
     updateCartBadge();
 
     const originalText = addToCartBtn.textContent;
-    addToCartBtn.textContent = "담았습니다";
+    addToCartBtn.textContent = "담았어요";
     addToCartBtn.disabled = true;
 
     window.setTimeout(() => {

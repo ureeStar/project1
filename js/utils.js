@@ -330,29 +330,35 @@ function consumeRedirectAfterLogin(fallbackUrl = "../index.html") {
   return redirectUrl;
 }
 
+function getCustomerAppBasePath() {
+  const scriptEl = [...document.scripts].find((script) => script.src.includes("/js/utils.js"));
+  if (!scriptEl) {
+    return "";
+  }
+
+  const scriptUrl = new URL(scriptEl.src, window.location.href);
+  return scriptUrl.pathname.replace(/\/js\/utils\.js$/, "");
+}
+
+function getCustomerUrl(path) {
+  const basePath = getCustomerAppBasePath();
+  return `${basePath}/${path}`.replace(/\/{2,}/g, "/");
+}
+
 function getCustomerLoginUrl() {
-  const path = window.location.pathname;
-  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
-  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
-  return `${prefix}auth/login.html`;
+  return getCustomerUrl("auth/login.html");
 }
 
 function getCustomerRegisterUrl() {
-  return getCustomerLoginUrl().replace("/login.html", "/register.html");
+  return getCustomerUrl("auth/register.html");
 }
 
 function getCustomerHomeUrl() {
-  const path = window.location.pathname;
-  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
-  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
-  return `${prefix}index.html`;
+  return getCustomerUrl("index.html");
 }
 
 function getCustomerMyUrl() {
-  const path = window.location.pathname;
-  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
-  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
-  return `${prefix}my/index.html`;
+  return getCustomerUrl("my/index.html");
 }
 
 function setPostLoginToast(message) {

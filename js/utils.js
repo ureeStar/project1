@@ -1,6 +1,6 @@
-// ===== Shared formatting =====
+// ===== 포맷 유틸리티 =====
 function formatPrice(price) {
-  return `${Number(price || 0).toLocaleString("ko-KR")}원`;
+  return `${price.toLocaleString("ko-KR")}원`;
 }
 
 function formatDate(dateInput) {
@@ -19,51 +19,15 @@ function getStatusClass(status) {
   return "status-received";
 }
 
-// ===== Shared storage keys =====
+// ===== 장바구니 유틸리티 (localStorage 기반) =====
 const CART_STORAGE_KEY = "cafe-app:cart";
 const CART_COMPAT_STORAGE_KEY = "cartItems";
-const CURRENT_USER_KEY = "currentUser";
-const REGISTERED_USERS_KEY = "registeredUsers";
-const WISHLIST_STORAGE_KEY = "wishlistItems";
-const GUEST_SCOPE_KEY = "cafe-app:guest-scope-id";
-const PENDING_ACTION_KEY = "pendingAction";
-const REDIRECT_AFTER_LOGIN_KEY = "redirectAfterLogin";
-const POST_LOGIN_TOAST_KEY = "postLoginToast";
 
-let cartCache = null;
-let wishlistCache = null;
-
-function safeParseJSON(raw, fallback) {
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return fallback;
-  }
-}
-
-// ===== Cart utilities =====
 function normalizeCartItemOptions(options = {}) {
   return {
     temperature: options.temperature || null,
     size: options.size || null,
   };
-}
-
-function normalizeCartItems(items) {
-  if (!Array.isArray(items)) return [];
-
-  return items
-    .filter((item) => item && item.menuId)
-    .map((item) => {
-      const options = normalizeCartItemOptions(item);
-      return {
-        menuId: item.menuId,
-        quantity: Math.max(1, Number(item.quantity) || 1),
-        temperature: options.temperature,
-        size: options.size,
-      };
-    });
 }
 
 function getCartItemKey(menuId, options = {}) {
@@ -75,123 +39,31 @@ function getCartItemKey(menuId, options = {}) {
   ].join("::");
 }
 
-function getCurrentUser() {
-  const user = safeParseJSON(localStorage.getItem(CURRENT_USER_KEY), null);
-  return user && typeof user === "object" ? user : null;
-}
-
-function getGuestScopeId() {
-  let scopeId = localStorage.getItem(GUEST_SCOPE_KEY);
-  if (!scopeId) {
-    scopeId = `guest-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    localStorage.setItem(GUEST_SCOPE_KEY, scopeId);
-  }
-  return scopeId;
-}
-
-function getCartScopeId() {
-  const user = getCurrentUser();
-  return user?.id || getGuestScopeId();
-}
-
-function readLegacyCartItems() {
+function getCart() {
   const raw = localStorage.getItem(CART_STORAGE_KEY) || localStorage.getItem(CART_COMPAT_STORAGE_KEY);
-  return normalizeCartItems(safeParseJSON(raw, []));
-}
-
-function clearLegacyCartStorage() {
-  localStorage.removeItem(CART_STORAGE_KEY);
-  localStorage.removeItem(CART_COMPAT_STORAGE_KEY);
-}
-
-function mapDbCartItem(row) {
-  return {
-    menuId: row.menu_id,
-    quantity: Number(row.quantity) || 1,
-    temperature: row.temperature || null,
-    size: row.size || null,
-  };
-}
-
-function persistCartItems(scopeId, cartItems) {
-  const normalizedItems = normalizeCartItems(cartItems);
-  supabaseRequestSync("DELETE", "cart_items", `user_id=eq.${encodeURIComponent(scopeId)}`);
-
-  normalizedItems.forEach((item) => {
-    supabaseRequestSync("POST", "cart_items", "", {
-      user_id: scopeId,
-      menu_id: item.menuId,
-      quantity: item.quantity,
-      temperature: item.temperature || null,
-      size: item.size || null,
-    });
-  });
-
-  cartCache = {
-    scopeId,
-    items: normalizedItems.map((item) => ({ ...item })),
-  };
-
-  return cartCache.items.map((item) => ({ ...item }));
-}
-
-function loadCartFromDb() {
-  const scopeId = getCartScopeId();
-  if (cartCache && cartCache.scopeId === scopeId) {
-    return cartCache.items.map((item) => ({ ...item }));
-  }
-
+  if (!raw) return [];
   try {
-    const rows = supabaseRequestSync(
-      "GET",
-      "cart_items",
-      `select=*&user_id=eq.${encodeURIComponent(scopeId)}&order=created_at.asc`
-    );
-    const dbItems = normalizeCartItems(rows.map(mapDbCartItem));
-
-    if (!dbItems.length) {
-      const legacyItems = readLegacyCartItems();
-      if (legacyItems.length) {
-        const migratedItems = persistCartItems(scopeId, legacyItems);
-        clearLegacyCartStorage();
-        return migratedItems;
-      }
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
     }
 
-    cartCache = {
-      scopeId,
-      items: dbItems,
-    };
-    return dbItems.map((item) => ({ ...item }));
+    return parsed.map((item) => {
+      const options = normalizeCartItemOptions(item);
+      return {
+        ...item,
+        temperature: options.temperature,
+        size: options.size,
+      };
+    });
   } catch {
-    const legacyItems = readLegacyCartItems();
-    cartCache = {
-      scopeId,
-      items: legacyItems,
-    };
-    return legacyItems.map((item) => ({ ...item }));
+    return [];
   }
-}
-
-function getCart() {
-  return loadCartFromDb();
 }
 
 function saveCart(cartItems) {
-  const scopeId = getCartScopeId();
-
-  try {
-    return persistCartItems(scopeId, cartItems);
-  } catch {
-    const normalizedItems = normalizeCartItems(cartItems);
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(normalizedItems));
-    localStorage.setItem(CART_COMPAT_STORAGE_KEY, JSON.stringify(normalizedItems));
-    cartCache = {
-      scopeId,
-      items: normalizedItems,
-    };
-    return normalizedItems.map((item) => ({ ...item }));
-  }
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+  localStorage.setItem(CART_COMPAT_STORAGE_KEY, JSON.stringify(cartItems));
 }
 
 function addToCart(menuId, quantity = 1, options = {}) {
@@ -211,7 +83,8 @@ function addToCart(menuId, quantity = 1, options = {}) {
     });
   }
 
-  return saveCart(cartItems);
+  saveCart(cartItems);
+  return cartItems;
 }
 
 function updateCartItemQuantity(menuId, quantity, options = {}) {
@@ -227,13 +100,15 @@ function updateCartItemQuantity(menuId, quantity, options = {}) {
     }
   }
 
-  return saveCart(cartItems);
+  saveCart(cartItems);
+  return cartItems;
 }
 
 function removeFromCart(menuId, options = {}) {
   const itemKey = getCartItemKey(menuId, options);
   const cartItems = getCart().filter((item) => getCartItemKey(item.menuId, item) !== itemKey);
-  return saveCart(cartItems);
+  saveCart(cartItems);
+  return cartItems;
 }
 
 function clearCart() {
@@ -252,74 +127,53 @@ function getCartTotalPrice(getMenuByIdFn) {
   }, 0);
 }
 
-function mergeGuestCartIntoUser(userId) {
-  if (!userId) return;
+// ===== Auth / Wishlist utilities (localStorage based) =====
+const CURRENT_USER_KEY = "currentUser";
+const REGISTERED_USERS_KEY = "registeredUsers";
+const WISHLIST_STORAGE_KEY = "wishlistItems";
+const PENDING_ACTION_KEY = "pendingAction";
+const REDIRECT_AFTER_LOGIN_KEY = "redirectAfterLogin";
+const POST_LOGIN_TOAST_KEY = "postLoginToast";
 
-  const guestScopeId = localStorage.getItem(GUEST_SCOPE_KEY);
-  if (!guestScopeId || guestScopeId === userId) return;
-
+function safeParseJSON(raw, fallback) {
+  if (!raw) return fallback;
   try {
-    const guestRows = supabaseRequestSync(
-      "GET",
-      "cart_items",
-      `select=*&user_id=eq.${encodeURIComponent(guestScopeId)}&order=created_at.asc`
-    );
-    const userRows = supabaseRequestSync(
-      "GET",
-      "cart_items",
-      `select=*&user_id=eq.${encodeURIComponent(userId)}&order=created_at.asc`
-    );
-
-    const mergedMap = new Map();
-    [...userRows.map(mapDbCartItem), ...guestRows.map(mapDbCartItem)].forEach((item) => {
-      const key = getCartItemKey(item.menuId, item);
-      const existing = mergedMap.get(key);
-      if (existing) {
-        existing.quantity += item.quantity;
-      } else {
-        mergedMap.set(key, { ...item });
-      }
-    });
-
-    if (mergedMap.size) {
-      persistCartItems(userId, [...mergedMap.values()]);
-      supabaseRequestSync("DELETE", "cart_items", `user_id=eq.${encodeURIComponent(guestScopeId)}`);
-    }
+    return JSON.parse(raw);
   } catch {
-    const legacyItems = readLegacyCartItems();
-    if (legacyItems.length) {
-      saveCart(legacyItems);
-      clearLegacyCartStorage();
-    }
+    return fallback;
   }
 }
 
-// ===== Auth utilities =====
+function getCurrentUser() {
+  const user = safeParseJSON(localStorage.getItem(CURRENT_USER_KEY), null);
+  return user && typeof user === "object" ? user : null;
+}
+
 function isLoggedIn() {
   return Boolean(getCurrentUser());
 }
 
 function saveCurrentUser(user) {
   localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  mergeGuestCartIntoUser(user?.id);
-  cartCache = null;
-  wishlistCache = null;
   return user;
 }
 
 function logoutCurrentUser() {
   localStorage.removeItem(CURRENT_USER_KEY);
-  cartCache = null;
-  wishlistCache = null;
+}
+
+function getRegisteredUsers() {
+  const users = safeParseJSON(localStorage.getItem(REGISTERED_USERS_KEY), []);
+  return Array.isArray(users) ? users : [];
+}
+
+function saveRegisteredUsers(users) {
+  localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(users));
+  return users;
 }
 
 function findUserByLoginId(loginId) {
-  const dbUsers =
-    typeof window.getRegisteredUsers === "function"
-      ? window.getRegisteredUsers()
-      : [];
-  const fallbackUsers = safeParseJSON(localStorage.getItem(REGISTERED_USERS_KEY), []);
-  return [...dbUsers, ...fallbackUsers].find((user) => user.loginId === loginId) || null;
+  return getRegisteredUsers().find((user) => user.loginId === loginId) || null;
 }
 
 function registerLocalUser(userInput) {
@@ -337,56 +191,22 @@ function registerLocalUser(userInput) {
     return { ok: false, reason: "duplicate-login-id" };
   }
 
-  const payload = {
+  const nextUser = {
     id: `user-${Date.now()}`,
-    login_id: loginId,
+    loginId,
     password,
     name,
     email,
-    favorite_menu: favoriteMenu,
+    favoriteMenu,
+    registeredAt: new Date().toISOString(),
   };
 
-  try {
-    const rows = supabaseRequestSync("POST", "registered_users", "", payload);
-    if (typeof refreshRegisteredUsersCache === "function") {
-      refreshRegisteredUsersCache();
-    }
-    localStorage.removeItem(REGISTERED_USERS_KEY);
+  saveRegisteredUsers([...getRegisteredUsers(), nextUser]);
 
-    const createdUser = rows[0] || {
-      ...payload,
-      registered_at: new Date().toISOString(),
-    };
-
-    return {
-      ok: true,
-      user: {
-        id: createdUser.id,
-        loginId: createdUser.login_id,
-        password: createdUser.password,
-        name: createdUser.name,
-        email: createdUser.email || "",
-        favoriteMenu: createdUser.favorite_menu || "",
-        registeredAt: createdUser.registered_at,
-      },
-    };
-  } catch {
-    const fallbackUsers = safeParseJSON(localStorage.getItem(REGISTERED_USERS_KEY), []);
-    const nextUser = {
-      id: payload.id,
-      loginId,
-      password,
-      name,
-      email,
-      favoriteMenu,
-      registeredAt: new Date().toISOString(),
-    };
-    localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify([...fallbackUsers, nextUser]));
-    return {
-      ok: true,
-      user: nextUser,
-    };
-  }
+  return {
+    ok: true,
+    user: nextUser,
+  };
 }
 
 function authenticateLocalUser(loginId, password) {
@@ -405,17 +225,53 @@ function authenticateLocalUser(loginId, password) {
   };
 }
 
-// ===== Wishlist utilities =====
+function getWishlistScopeKey() {
+  const currentUser = getCurrentUser();
+  return currentUser?.id || "guest";
+}
+
 function normalizeWishlistItems(items) {
-  if (!Array.isArray(items)) return [];
-  return items
-    .filter((item) => item && item.menuId)
-    .map((item) => ({
-      menuId: item.menuId,
-      name: item.name || "",
-      price: Number(item.price) || 0,
-      image: item.image || "",
-    }));
+  return Array.isArray(items) ? items : [];
+}
+
+function getWishlistStore() {
+  const parsed = safeParseJSON(localStorage.getItem(WISHLIST_STORAGE_KEY), {});
+
+  if (Array.isArray(parsed)) {
+    return {
+      guest: normalizeWishlistItems(parsed),
+    };
+  }
+
+  if (!parsed || typeof parsed !== "object") {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(parsed).map(([scopeKey, items]) => [scopeKey, normalizeWishlistItems(items)])
+  );
+}
+
+function saveWishlistStore(store) {
+  localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(store));
+  return store;
+}
+
+function getWishlist() {
+  const store = getWishlistStore();
+  return normalizeWishlistItems(store[getWishlistScopeKey()]);
+}
+
+function saveWishlist(items) {
+  const store = getWishlistStore();
+  const scopeKey = getWishlistScopeKey();
+  store[scopeKey] = normalizeWishlistItems(items);
+  saveWishlistStore(store);
+  return items;
+}
+
+function isWishlisted(menuId) {
+  return getWishlist().some((item) => item.menuId === menuId);
 }
 
 function buildWishlistItem(menu) {
@@ -425,120 +281,6 @@ function buildWishlistItem(menu) {
     price: Number(menu.price) || 0,
     image: menu.image || "",
   };
-}
-
-function getWishlist() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) {
-    wishlistCache = {
-      userId: null,
-      items: [],
-    };
-    return [];
-  }
-
-  if (wishlistCache && wishlistCache.userId === currentUser.id) {
-    return wishlistCache.items.map((item) => ({ ...item }));
-  }
-
-  try {
-    const rows = supabaseRequestSync(
-      "GET",
-      "wishlist_items",
-      `select=menu_id,menus(id,name,price,image)&user_id=eq.${encodeURIComponent(currentUser.id)}&order=created_at.asc`
-    );
-
-    let items = rows.map((row) => {
-      const menu = Array.isArray(row.menus) ? row.menus[0] : row.menus;
-      if (menu) {
-        return {
-          menuId: menu.id,
-          name: menu.name || "",
-          price: Number(menu.price) || 0,
-          image: menu.image || "",
-        };
-      }
-
-      if (typeof getMenuById === "function") {
-        const fallbackMenu = getMenuById(row.menu_id);
-        return fallbackMenu ? buildWishlistItem(fallbackMenu) : null;
-      }
-
-      return null;
-    }).filter(Boolean);
-
-    if (!items.length) {
-      const legacyStore = safeParseJSON(localStorage.getItem(WISHLIST_STORAGE_KEY), {});
-      const legacyItems = Array.isArray(legacyStore)
-        ? normalizeWishlistItems(legacyStore)
-        : normalizeWishlistItems(legacyStore?.[currentUser.id]);
-
-      if (legacyItems.length) {
-        items = saveWishlist(legacyItems);
-        const nextLegacyStore =
-          legacyStore && !Array.isArray(legacyStore) && typeof legacyStore === "object"
-            ? { ...legacyStore }
-            : {};
-        delete nextLegacyStore[currentUser.id];
-        localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(nextLegacyStore));
-        return items;
-      }
-    }
-
-    wishlistCache = {
-      userId: currentUser.id,
-      items: normalizeWishlistItems(items),
-    };
-    return wishlistCache.items.map((item) => ({ ...item }));
-  } catch {
-    const legacyStore = safeParseJSON(localStorage.getItem(WISHLIST_STORAGE_KEY), {});
-    const legacyItems = Array.isArray(legacyStore)
-      ? normalizeWishlistItems(legacyStore)
-      : normalizeWishlistItems(legacyStore?.[currentUser.id]);
-    wishlistCache = {
-      userId: currentUser.id,
-      items: legacyItems,
-    };
-    return legacyItems.map((item) => ({ ...item }));
-  }
-}
-
-function saveWishlist(items) {
-  const currentUser = getCurrentUser();
-  if (!currentUser) {
-    return [];
-  }
-
-  const normalizedItems = normalizeWishlistItems(items);
-
-  try {
-    supabaseRequestSync("DELETE", "wishlist_items", `user_id=eq.${encodeURIComponent(currentUser.id)}`);
-    normalizedItems.forEach((item) => {
-      supabaseRequestSync("POST", "wishlist_items", "", {
-        user_id: currentUser.id,
-        menu_id: item.menuId,
-      });
-    });
-  } catch {
-    const legacyStore = safeParseJSON(localStorage.getItem(WISHLIST_STORAGE_KEY), {});
-    const nextLegacyStore =
-      legacyStore && !Array.isArray(legacyStore) && typeof legacyStore === "object"
-        ? { ...legacyStore }
-        : {};
-    nextLegacyStore[currentUser.id] = normalizedItems;
-    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(nextLegacyStore));
-  }
-
-  wishlistCache = {
-    userId: currentUser.id,
-    items: normalizedItems,
-  };
-
-  return normalizedItems.map((item) => ({ ...item }));
-}
-
-function isWishlisted(menuId) {
-  return getWishlist().some((item) => item.menuId === menuId);
 }
 
 function addWishlistItem(menu) {
@@ -566,7 +308,6 @@ function toggleWishlistItem(menu) {
   };
 }
 
-// ===== Shared UX helpers =====
 function setPendingAction(action) {
   localStorage.setItem(PENDING_ACTION_KEY, JSON.stringify(action));
 }
@@ -589,43 +330,29 @@ function consumeRedirectAfterLogin(fallbackUrl = "../index.html") {
   return redirectUrl;
 }
 
-function getCustomerAppBasePath() {
-  const path = window.location.pathname;
-  const markers = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/", "/admin/", "/index.html"];
-  let cutIndex = path.length;
-
-  markers.forEach((marker) => {
-    const index = path.indexOf(marker);
-    if (index !== -1) {
-      cutIndex = Math.min(cutIndex, index);
-    }
-  });
-
-  if (cutIndex !== path.length) {
-    return path.slice(0, cutIndex) || "";
-  }
-
-  if (path.endsWith("/")) {
-    return path.slice(0, -1);
-  }
-
-  return path;
-}
-
 function getCustomerLoginUrl() {
-  return `${getCustomerAppBasePath()}/auth/login.html`;
+  const path = window.location.pathname;
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
+  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
+  return `${prefix}auth/login.html`;
 }
 
 function getCustomerRegisterUrl() {
-  return `${getCustomerAppBasePath()}/auth/register.html`;
+  return getCustomerLoginUrl().replace("/login.html", "/register.html");
 }
 
 function getCustomerHomeUrl() {
-  return `${getCustomerAppBasePath()}/index.html`;
+  const path = window.location.pathname;
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
+  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
+  return `${prefix}index.html`;
 }
 
 function getCustomerMyUrl() {
-  return `${getCustomerAppBasePath()}/my/index.html`;
+  const path = window.location.pathname;
+  const subDirectories = ["/menus/", "/basket/", "/orders/", "/my/", "/wishlist/", "/auth/"];
+  const prefix = subDirectories.some((directory) => path.includes(directory)) ? "../" : "./";
+  return `${prefix}my/index.html`;
 }
 
 function setPostLoginToast(message) {
@@ -813,10 +540,10 @@ function renderHeaderAuth() {
       logoutCurrentUser();
       clearPendingAction();
       localStorage.removeItem(REDIRECT_AFTER_LOGIN_KEY);
-      showAppToast("로그아웃 되었어요.");
       window.setTimeout(() => {
         window.location.href = getCustomerHomeUrl();
       }, 180);
+      showAppToast("로그아웃되었습니다.");
     };
   });
 }
